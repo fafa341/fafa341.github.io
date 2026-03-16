@@ -20,10 +20,10 @@
       --surface:   #FBF8F4;
       --surface2:  #EDE8DF;
       --border:    #DDD8D0;
-      --text:      #1C1917;
-      --muted:     #78766E;
-      --accent:    #2563EB;
-      --accent2:   #1D4ED8;
+      --text:      #354F6E;
+      --muted:     #6B88A2;
+      --accent:    #4F7EA8;
+      --accent2:   #3A6590;
       --green:     #16A34A;
       --red:       #DC2626;
       --yellow:    #B45309;
@@ -228,7 +228,7 @@
     }
     #event-pins {
       position: absolute; top: 0; left: 0; right: 0;
-      height: 48px; pointer-events: none;
+      height: 64px; pointer-events: none;
     }
     .epin {
       position: absolute; transform: translateX(-50%);
@@ -236,10 +236,17 @@
       display: flex; flex-direction: column; align-items: center;
       pointer-events: all; cursor: pointer;
     }
+    /* Alternate pins show label at bottom to avoid overlap */
+    .epin-alt {
+      flex-direction: column-reverse;
+    }
     .epin-lbl {
       font-size: 8px; font-weight: 600;
       color: var(--yellow); white-space: nowrap;
       text-align: center; line-height: 1; margin-bottom: 3px;
+    }
+    .epin-alt .epin-lbl {
+      margin-bottom: 0; margin-top: 3px;
     }
     .epin-vline {
       width: 1.5px; flex: 1;
@@ -257,6 +264,10 @@
       pointer-events: none;
       opacity: 0; transition: opacity 0.15s; z-index: 50;
       box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    }
+    /* Alt pins: tooltip above (from bottom perspective, which is the label side) */
+    .epin-alt .epin-tip {
+      bottom: auto; top: calc(100% + 6px);
     }
     .epin:hover .epin-tip { opacity: 1; }
     .epin-tip-title { font-weight: 700; margin-bottom: 4px; color: var(--yellow); }
@@ -1200,12 +1211,14 @@
   function buildPins() {
     const cont = document.getElementById('event-pins');
     const total = T.months.length - 1;
+    let pinIdx = 0;
     (T.key_events||[]).forEach(ev => {
       const ei = T.months.indexOf(ev.month);
       if (ei < 0) return;
       const pin = document.createElement('div');
-      pin.className = 'epin';
+      pin.className = 'epin' + (pinIdx % 2 === 1 ? ' epin-alt' : '');
       pin.style.left = (ei/total*100)+'%';
+      pinIdx++;
 
       // Tooltip (shown on hover)
       const tip = document.createElement('div');
