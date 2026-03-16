@@ -16,17 +16,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0d1117;
-      --surface:   #161b22;
-      --surface2:  #1f2937;
-      --border:    #30363d;
-      --text:      #e6edf3;
-      --muted:     #8b949e;
-      --accent:    #58a6ff;
-      --accent2:   #a5d6ff;
-      --green:     #3fb950;
-      --red:       #f85149;
-      --yellow:    #d29922;
+      --bg:        #F9F8F6;
+      --surface:   #FFFFFF;
+      --surface2:  #F3F2EF;
+      --border:    #E3E1DB;
+      --text:      #1C1917;
+      --muted:     #78766E;
+      --accent:    #2563EB;
+      --accent2:   #1D4ED8;
+      --green:     #16A34A;
+      --red:       #DC2626;
+      --yellow:    #B45309;
       --font:      'Lato', system-ui, -apple-system, sans-serif;
       --mono:      'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
     }
@@ -66,7 +66,8 @@
     #error-banner {
       display: none;
       position: fixed; top: 0; left: 0; right: 0;
-      background: #3d1a1a; color: #ffa0a0;
+      background: #FEF2F2; color: #B91C1C;
+      border-bottom: 1px solid #FECACA;
       padding: 10px 20px;
       text-align: center; font-size: 13px;
       z-index: 9998;
@@ -90,8 +91,9 @@
     nav a.home-link:hover { color: var(--text); text-decoration: none; }
     nav .nav-title {
       font-size: 13px; color: var(--muted);
-      margin-left: auto;
     }
+    #lang-toggle button:focus { outline: none; }
+    #lang-toggle button:hover { opacity: 0.85; }
 
     /* ── Hero ─────────────────────────────────────────────── */
     .hero {
@@ -199,7 +201,10 @@
     }
     #topic-hint { font-size: 12px; color: var(--muted); margin-left: auto; }
 
-    #slider-wrap { position: relative; }
+    #slider-wrap {
+      position: relative;
+      padding-top: 44px;
+    }
     #slider {
       width: 100%; -webkit-appearance: none; appearance: none;
       height: 3px; border-radius: 2px;
@@ -208,12 +213,12 @@
     #slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 14px; height: 14px; border-radius: 50%;
-      background: var(--accent2); border: 2px solid var(--bg);
+      background: var(--accent); border: 2px solid var(--bg);
       cursor: pointer;
     }
     #slider::-moz-range-thumb {
       width: 14px; height: 14px; border-radius: 50%;
-      background: var(--accent2); border: 2px solid var(--bg);
+      background: var(--accent); border: 2px solid var(--bg);
       cursor: pointer;
     }
     #year-labels {
@@ -222,34 +227,39 @@
       font-size: 10px; color: var(--muted);
     }
     #event-pins {
-      position: absolute; top: -24px; left: 0; right: 0;
-      pointer-events: none;
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 48px; pointer-events: none;
     }
     .epin {
       position: absolute; transform: translateX(-50%);
+      height: 100%;
+      display: flex; flex-direction: column; align-items: center;
       pointer-events: all; cursor: pointer;
     }
-    .epin-dot {
-      width: 7px; height: 7px;
-      background: var(--yellow); border-radius: 50%;
-      margin: 0 auto; transition: transform 0.15s;
-    }
-    .epin:hover .epin-dot { transform: scale(1.7); }
     .epin-lbl {
-      font-size: 9px; color: var(--yellow);
-      white-space: nowrap; text-align: center; margin-top: 1px;
+      font-size: 8px; font-weight: 600;
+      color: var(--yellow); white-space: nowrap;
+      text-align: center; line-height: 1; margin-bottom: 3px;
     }
+    .epin-vline {
+      width: 1.5px; flex: 1;
+      background: var(--yellow); opacity: 0.55;
+      transition: opacity 0.15s;
+    }
+    .epin:hover .epin-vline { opacity: 1; }
     .epin-tip {
-      position: absolute; bottom: 18px; left: 50%;
+      position: absolute; bottom: calc(100% + 6px); left: 50%;
       transform: translateX(-50%);
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 5px; padding: 5px 8px;
-      font-size: 11px; color: var(--text);
-      white-space: normal; max-width: min(220px, 60vw);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 7px; padding: 10px 14px;
+      font-size: 12px; color: var(--text); line-height: 1.55;
+      white-space: normal; min-width: 260px; max-width: min(340px, 85vw);
       pointer-events: none;
       opacity: 0; transition: opacity 0.15s; z-index: 50;
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
     }
     .epin:hover .epin-tip { opacity: 1; }
+    .epin-tip-title { font-weight: 700; margin-bottom: 4px; color: var(--yellow); }
 
     /* ── Main viz layout ──────────────────────────────────── */
     #viz-grid {
@@ -277,10 +287,10 @@
       transition: opacity 0.15s;
     }
     .tm-cell:hover rect { opacity: 0.82; }
-    .tm-cell.selected rect { stroke: #fff; stroke-width: 2.5; }
+    .tm-cell.selected rect { stroke: var(--text); stroke-width: 2.5; }
     .tm-label { pointer-events: none; user-select: none; }
-    .tm-label-main { font-size: 12px; font-weight: 700; fill: rgba(255,255,255,.93); }
-    .tm-label-sub  { font-size: 10px; fill: rgba(255,255,255,.65); }
+    .tm-label-main { font-size: 12px; font-weight: 700; fill: rgba(0,0,0,.78); }
+    .tm-label-sub  { font-size: 10px; fill: rgba(0,0,0,.52); }
 
     #tm-tooltip {
       position: absolute;
@@ -466,7 +476,11 @@
       <a class="home-link" href="..">
         ← Fabio Fuentes
       </a>
-      <span class="nav-title">Chilean Discourse · 2012–2024</span>
+      <span class="nav-title" data-i18n="nav-title">Chilean Discourse · 2012–2024</span>
+      <div id="lang-toggle" style="margin-left:auto;display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;flex-shrink:0;">
+        <button id="btn-en" onclick="setLang('en')" style="padding:4px 10px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:var(--accent);color:#fff;transition:background 0.15s;">EN</button>
+        <button id="btn-es" onclick="setLang('es')" style="padding:4px 10px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:var(--surface2);color:var(--muted);transition:background 0.15s;">ES</button>
+      </div>
     </div>
   </nav>
 
@@ -474,22 +488,22 @@
 
     <!-- Hero -->
     <header class="hero">
-      <div class="eyebrow">Undergraduate Thesis · Universidad de Chile · 2024</div>
-      <h1>How <em>Chile talked to itself</em><br>over 12 years of news</h1>
-      <p class="subtitle">
-        60,000+ articles from <em>La Tercera</em> (2012–2024), decomposed into
+      <div class="eyebrow" data-i18n="eyebrow">Undergraduate Thesis · Universidad Andrés Bello · 2025</div>
+      <h1 data-i18n-html="hero-h1">How <em>Chile talked to itself</em><br>over 12 years of news</h1>
+      <p class="subtitle" data-i18n-html="hero-subtitle">
+        60,000+ articles from <em>La Tercera</em> and <em>Biobío</em> (2012–2024), decomposed into
         10 discourse topics via Latent Dirichlet Allocation. Explore how
         Chilean public conversation shifted across elections, protests,
         and economic crises.
       </p>
       <div class="hero-links">
-        <a href="https://docs.google.com/document/d/1xqA7kIex1yJrXBbAT9yd6231NXWr-IRydU7ExGlB6vI/edit" target="_blank" rel="noopener">Read the paper ↗</a>
-        <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">View code ↗</a>
+        <a href="https://docs.google.com/document/d/1xqA7kIex1yJrXBbAT9yd6231NXWr-IRydU7ExGlB6vI/edit" target="_blank" rel="noopener" data-i18n="btn-paper">Read the paper ↗</a>
+        <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener" data-i18n="btn-code">View code ↗</a>
       </div>
       <div class="stats">
         <div>
           <div class="stat-val">60K+</div>
-          <div class="stat-lbl">Articles</div>
+          <div class="stat-lbl" data-i18n="lbl-articles">Articles</div>
         </div>
         <div>
           <div class="stat-val">12 yrs</div>
@@ -497,11 +511,11 @@
         </div>
         <div>
           <div class="stat-val">10</div>
-          <div class="stat-lbl">Topics found by LDA</div>
+          <div class="stat-lbl" data-i18n="lbl-topics">Topics found by LDA</div>
         </div>
         <div>
           <div class="stat-val" id="s-months">156</div>
-          <div class="stat-lbl">Monthly snapshots</div>
+          <div class="stat-lbl" data-i18n="lbl-months">Monthly snapshots</div>
         </div>
       </div>
     </header>
@@ -509,19 +523,19 @@
     <!-- Intro steps -->
     <div class="intro-steps">
       <div class="intro-step">
-        <div class="step-num">01 · Corpus</div>
-        <h3>12 years of economic journalism</h3>
-        <p>Every article from <em>La Tercera</em>'s business section was archived via the Wayback Machine, spanning four presidential terms.</p>
+        <div class="step-num" data-i18n="step1-num">01 · Corpus</div>
+        <h3 data-i18n="step1-h">12 years of economic journalism</h3>
+        <p data-i18n-html="step1-p">Articles from <em>La Tercera</em> and <em>Biobío</em>'s business sections were archived via the Wayback Machine, spanning four presidential terms.</p>
       </div>
       <div class="intro-step">
-        <div class="step-num">02 · Model</div>
-        <h3>10 topics, discovered unsupervised</h3>
-        <p>LDA decomposed 60K documents into 10 recurring themes — no labels imposed. Each article is a soft mix of all 10 topics.</p>
+        <div class="step-num" data-i18n="step2-num">02 · Model</div>
+        <h3 data-i18n="step2-h">10 topics, discovered unsupervised</h3>
+        <p data-i18n="step2-p">LDA decomposed 60K documents into 10 recurring themes — no labels imposed. Each article is a soft mix of all 10 topics.</p>
       </div>
       <div class="intro-step">
-        <div class="step-num">03 · Explore</div>
-        <h3>Watch the discourse shift</h3>
-        <p>Press play or drag the slider. Each cell represents a topic; its size shows how much of the conversation it occupied that month.</p>
+        <div class="step-num" data-i18n="step3-num">03 · Explore</div>
+        <h3 data-i18n="step3-h">Watch the discourse shift</h3>
+        <p data-i18n="step3-p">Press play or drag the slider. Each cell represents a topic; its size shows how much of the conversation it occupied that month.</p>
       </div>
     </div>
 
@@ -533,7 +547,7 @@
           <svg id="pause-icon" viewBox="0 0 10 12" style="display:none"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>
         </button>
         <span id="month-label">2012-01</span>
-        <span id="topic-hint">← click a topic to explore it</span>
+        <span id="topic-hint" data-i18n="topic-hint">← click a topic to explore it</span>
       </div>
       <div id="slider-wrap">
         <div id="event-pins"></div>
@@ -560,7 +574,7 @@
             <rect x="4" y="22" width="8" height="14" rx="2"/>
             <rect x="16" y="22" width="20" height="14" rx="2"/>
           </svg>
-          Click a topic cell to explore it
+          <span data-i18n="d-empty">Click a topic cell to explore it</span>
         </div>
         <div id="d-content">
           <div class="d-hdr">
@@ -572,13 +586,13 @@
             <div class="d-pct" id="d-pct"></div>
           </div>
           <div class="d-summary" id="d-summary"></div>
-          <div class="sec-label">Proportion over time</div>
+          <div class="sec-label" data-i18n="sec-proportion">Proportion over time</div>
           <svg id="spark-svg"></svg>
-          <div class="sec-label">Top words</div>
+          <div class="sec-label" data-i18n="sec-words">Top words</div>
           <div class="chips" id="chips"></div>
-          <div class="sec-label">Representative articles</div>
+          <div class="sec-label" data-i18n="sec-articles">Representative articles</div>
           <div id="art-list"></div>
-          <button id="show-more" style="display:none">Show more articles</button>
+          <button id="show-more" data-i18n="show-more" style="display:none">Show more articles</button>
         </div>
       </div>
     </div>
@@ -587,39 +601,42 @@
     <div id="macro-section">
       <div class="macro-hdr">
         <div>
-          <h3>Macroeconomic Overlay</h3>
-          <p>Correlate topic proportions with IMACEC economic activity and unemployment.</p>
+          <h3 data-i18n="macro-h">Macroeconomic Overlay</h3>
+          <p data-i18n="macro-p">Correlate topic proportions with IMACEC economic activity and unemployment.</p>
         </div>
-        <button id="macro-toggle">Show overlay</button>
+        <button id="macro-toggle" data-i18n="macro-show">Show overlay</button>
       </div>
       <div id="macro-chart">
         <svg id="macro-svg"></svg>
         <div class="legend">
-          <div class="leg-item"><div class="leg-sw" id="leg-topic" style="background:#58a6ff"></div>Selected topic</div>
-          <div class="leg-item"><div class="leg-sw" style="background:#d29922"></div>IMACEC growth rate</div>
-          <div class="leg-item"><div class="leg-sw" style="background:#f85149"></div>Unemployment (%)</div>
+          <div class="leg-item"><div class="leg-sw" style="background:#D97706"></div><span data-i18n="leg-imacec">IMACEC (economic activity)</span></div>
+          <div class="leg-item"><div class="leg-sw" style="background:#DC2626"></div><span data-i18n="leg-unemp">Unemployment (%)</span></div>
+          <div class="leg-item"><div class="leg-sw" id="leg-topic" style="background:#A8C5DA"></div><span data-i18n="leg-topic">Selected topic</span></div>
         </div>
       </div>
     </div>
 
     <!-- Methodology -->
     <section id="method">
-      <h2>Methodology</h2>
-      <p class="sub">
+      <h2 data-i18n="method-h">Methodology</h2>
+      <p class="sub" data-i18n-html="method-sub">
         A full reproducible NLP pipeline — from raw HTML to interactive visualization —
         without pre-labeled training data. All code is
         <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.
       </p>
 
       <div class="pipeline"><span class="dim">┌──────────────────────────────────────────────────────────────────┐</span>
-<span class="dim">│</span>  <span class="hl">DATA PIPELINE</span>                                                    <span class="dim">│</span>
+<span class="dim">│</span>  <span class="hl">NLP PIPELINE</span>                                                     <span class="dim">│</span>
 <span class="dim">└──────────────────────────────────────────────────────────────────┘</span>
 
-  <span class="hl">Raw HTML</span>          web.archive.org · La Tercera · 60,348 articles
+  <span class="hl">Raw HTML</span>          web.archive.org · La Tercera + Biobío · 60,348 articles
       │              Jan 2012 → Dec 2024
       ▼
   <span class="hl">Clean</span>             Remove boilerplate · decode \\uXXXX escapes
       │              normalize unicode · strip copyright noise
+      ▼
+  <span class="hl">NLP</span>               Stanford Stanza · tokenization · lemmatization
+      │              POS tagging · Spanish named-entity recognition
       ▼
   <span class="hl">Feature Matrix</span>    TF-IDF bag-of-words · 10,000-term vocabulary
       │              Sparse document-term matrix (60K × 10K)
@@ -642,8 +659,12 @@
           <p>Latent Dirichlet Allocation discovers latent themes from word co-occurrence. Each article is a soft mix of all 10 topics, enabling temporal analysis.</p>
         </div>
         <div class="m-card">
-          <h4>Corpus: La Tercera</h4>
-          <p>Chile's leading newspaper, economics section, archived via the Wayback Machine. Covers nearly the full Chilean business-cycle period studied.</p>
+          <h4>NLP: Stanford Stanza</h4>
+          <p>Spanish-language NLP pipeline for tokenization, lemmatization, POS tagging, and named-entity recognition — enabling clean, linguistically-aware text features.</p>
+        </div>
+        <div class="m-card">
+          <h4>Corpus: La Tercera + Biobío</h4>
+          <p>Two leading Chilean outlets — La Tercera (national) and Biobío (digital-native) — archived via the Wayback Machine across four presidential terms.</p>
         </div>
         <div class="m-card">
           <h4>Sentiment: BETO</h4>
@@ -659,7 +680,7 @@
   </div><!-- /.page -->
 
   <footer>
-    Fabio Fuentes · Universidad de Chile · 2024 &nbsp;·&nbsp;
+    <span data-i18n="footer">Fabio Fuentes · Universidad Andrés Bello · 2025</span> &nbsp;·&nbsp;
     <a href="..">Portfolio</a> &nbsp;·&nbsp;
     <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">GitHub</a>
   </footer>
@@ -799,8 +820,8 @@
     document.getElementById('d-empty').style.display = 'none';
     document.getElementById('d-content').style.display = 'block';
     document.getElementById('d-dot').style.background = t.color;
-    document.getElementById('d-title').textContent = t.label;
-    document.getElementById('d-title-es').textContent = t.label_es;
+    document.getElementById('d-title').textContent = lang === 'es' ? t.label_es : t.label;
+    document.getElementById('d-title-es').textContent = lang === 'es' ? t.label : t.label_es;
     document.getElementById('d-pct').textContent = (props[id]*100).toFixed(1)+'%';
     document.getElementById('d-summary').textContent = t.summary || t.description;
 
@@ -846,7 +867,7 @@
     // cursor
     const cx = x(T.months[idx]);
     g.append('line').attr('x1',cx).attr('x2',cx).attr('y1',0).attr('y2',iH)
-      .attr('stroke','#fff').attr('stroke-width',1).attr('stroke-dasharray','2,2').attr('opacity',0.45);
+      .attr('stroke','var(--muted)').attr('stroke-width',1).attr('stroke-dasharray','2,2').attr('opacity',0.55);
 
     // year axis
     const seen = new Set();
@@ -967,15 +988,30 @@
       const pin = document.createElement('div');
       pin.className = 'epin';
       pin.style.left = (ei/total*100)+'%';
+
+      // Tooltip (shown on hover)
       const tip = document.createElement('div');
       tip.className = 'epin-tip';
-      tip.textContent = ev.description;
-      const dot = document.createElement('div');
-      dot.className = 'epin-dot';
+      const title = document.createElement('div');
+      title.className = 'epin-tip-title';
+      title.textContent = ev.label;
+      const desc = document.createElement('div');
+      desc.textContent = ev.description;
+      tip.appendChild(title);
+      tip.appendChild(desc);
+
+      // Short label above the vertical line
       const lbl = document.createElement('div');
       lbl.className = 'epin-lbl';
       lbl.textContent = ev.label;
-      pin.appendChild(tip); pin.appendChild(dot); pin.appendChild(lbl);
+
+      // Vertical line striking through the slider area
+      const vline = document.createElement('div');
+      vline.className = 'epin-vline';
+
+      pin.appendChild(tip);
+      pin.appendChild(lbl);
+      pin.appendChild(vline);
       pin.addEventListener('click', () => { stopAnim(); goTo(ei); });
       cont.appendChild(pin);
     });
@@ -1018,13 +1054,13 @@
     macroOn = !macroOn;
     document.getElementById('macro-chart').classList.toggle('on', macroOn);
     document.getElementById('macro-toggle').classList.toggle('on', macroOn);
-    document.getElementById('macro-toggle').textContent = macroOn ? 'Hide overlay' : 'Show overlay';
+    document.getElementById('macro-toggle').textContent = macroOn ? STRINGS[lang]['macro-hide'] : STRINGS[lang]['macro-show'];
     if (macroOn) renderMacro();
   });
 
   function renderMacro() {
     const W = document.getElementById('macro-section').clientWidth - 40;
-    const H = 150, ml=32, mr=12, mt=10, mb=24;
+    const H = 220, ml=32, mr=12, mt=10, mb=24;
     const iW = W-ml-mr, iH = H-mt-mb;
     const sv = d3.select('#macro-svg');
     sv.selectAll('*').remove();
@@ -1044,24 +1080,24 @@
       g.append('line').attr('x1',0).attr('x2',iW).attr('y1',yS(v)).attr('y2',yS(v))
         .attr('stroke','var(--border)').attr('stroke-width',0.5);
     });
-    const addLine = (key, vals, color) => {
+    const addLine = (key, vals, color, width) => {
       if (!vals.length) return;
       const ln = d3.line().defined(d=>d[key]!==null).x(d=>xS(d.i)).y(d=>yS(norm(d[key],vals))).curve(d3.curveCatmullRom.alpha(0.5));
-      g.append('path').datum(aligned).attr('fill','none').attr('stroke',color).attr('stroke-width',1.5).attr('opacity',0.85).attr('d',ln);
+      g.append('path').datum(aligned).attr('fill','none').attr('stroke',color).attr('stroke-width',width||2).attr('opacity',0.9).attr('d',ln);
     };
     const topicVals = aligned.map(d=>d.topic).filter(v=>v!==null);
     const imacecVals = aligned.map(d=>d.imacec).filter(v=>v!==null);
     const unempVals  = aligned.map(d=>d.unemp).filter(v=>v!==null);
+    addLine('imacec', imacecVals, '#D97706');
+    addLine('unemp',  unempVals,  '#DC2626');
     if (topicVals.length && sel !== null) {
-      addLine('topic', topicVals, topics[sel].color);
+      addLine('topic', topicVals, topics[sel].color, 2.5);
       document.getElementById('leg-topic').style.background = topics[sel].color;
     }
-    addLine('imacec', imacecVals, '#d29922');
-    addLine('unemp',  unempVals,  '#f85149');
     // cursor
     const cx = xS(idx);
     g.append('line').attr('x1',cx).attr('x2',cx).attr('y1',0).attr('y2',iH)
-      .attr('stroke','#fff').attr('stroke-width',1).attr('stroke-dasharray','3,3').attr('opacity',0.5);
+      .attr('stroke','var(--muted)').attr('stroke-width',1).attr('stroke-dasharray','3,3').attr('opacity',0.6);
     // x axis
     const seen = new Set();
     T.months.forEach((m,i) => {
@@ -1071,6 +1107,112 @@
         g.append('text').attr('x',xS(i)).attr('y',iH+16).attr('font-size',10).attr('fill','var(--muted)').text(yr);
       }
     });
+  }
+
+  // ═══════════════════════════════════════════════════════
+  //  INTERNATIONALISATION
+  // ═══════════════════════════════════════════════════════
+  let lang = 'en';
+  const STRINGS = {
+    en: {
+      'nav-title':     'Chilean Discourse · 2012–2024',
+      'eyebrow':       'Undergraduate Thesis · Universidad Andrés Bello · 2025',
+      'hero-h1':       'How <em>Chile talked to itself</em><br>over 12 years of news',
+      'hero-subtitle': '60,000+ articles from <em>La Tercera</em> and <em>Biobío</em> (2012–2024), decomposed into 10 discourse topics via Latent Dirichlet Allocation. Explore how Chilean public conversation shifted across elections, protests, and economic crises.',
+      'btn-paper':     'Read the paper ↗',
+      'btn-code':      'View code ↗',
+      'lbl-articles':  'Articles',
+      'lbl-months':    'Monthly snapshots',
+      'lbl-topics':    'Topics found by LDA',
+      'step1-num':     '01 · Corpus',
+      'step1-h':       '12 years of economic journalism',
+      'step1-p':       'Articles from <em>La Tercera</em> and <em>Biobío</em>\'s business sections were archived via the Wayback Machine, spanning four presidential terms.',
+      'step2-num':     '02 · Model',
+      'step2-h':       '10 topics, discovered unsupervised',
+      'step2-p':       'LDA decomposed 60K documents into 10 recurring themes — no labels imposed. Each article is a soft mix of all 10 topics.',
+      'step3-num':     '03 · Explore',
+      'step3-h':       'Watch the discourse shift',
+      'step3-p':       'Press play or drag the slider. Each cell represents a topic; its size shows how much of the conversation it occupied that month.',
+      'topic-hint':    '← click a topic to explore it',
+      'd-empty':       'Click a topic cell to explore it',
+      'sec-proportion':'Proportion over time',
+      'sec-words':     'Top words',
+      'sec-articles':  'Representative articles',
+      'show-more':     'Show more articles',
+      'macro-h':       'Macroeconomic Overlay',
+      'macro-p':       'Correlate topic proportions with IMACEC economic activity and unemployment.',
+      'macro-show':    'Show overlay',
+      'macro-hide':    'Hide overlay',
+      'leg-imacec':    'IMACEC (economic activity)',
+      'leg-unemp':     'Unemployment (%)',
+      'leg-topic':     'Selected topic',
+      'method-h':      'Methodology',
+      'method-sub':    'A full reproducible NLP pipeline — from raw HTML to interactive visualization — without pre-labeled training data. All code is <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.',
+      'footer':        'Fabio Fuentes · Universidad Andrés Bello · 2025',
+    },
+    es: {
+      'nav-title':     'Discurso Chileno · 2012–2024',
+      'eyebrow':       'Tesis de Pregrado · Universidad Andrés Bello · 2025',
+      'hero-h1':       'Cómo <em>Chile conversó consigo mismo</em><br>en 12 años de noticias',
+      'hero-subtitle': 'Más de 60,000 artículos de <em>La Tercera</em> y <em>Biobío</em> (2012–2024), descompuestos en 10 temas discursivos mediante Asignación Latente de Dirichlet. Explora cómo la conversación pública chilena cambió entre elecciones, protestas y crisis económicas.',
+      'btn-paper':     'Leer el artículo ↗',
+      'btn-code':      'Ver código ↗',
+      'lbl-articles':  'Artículos',
+      'lbl-months':    'Instantáneas mensuales',
+      'lbl-topics':    'Temas (LDA)',
+      'step1-num':     '01 · Corpus',
+      'step1-h':       '12 años de periodismo económico',
+      'step1-p':       'Artículos de las secciones de negocios de <em>La Tercera</em> y <em>Biobío</em> fueron archivados vía Wayback Machine, abarcando cuatro períodos presidenciales.',
+      'step2-num':     '02 · Modelo',
+      'step2-h':       '10 temas, descubiertos sin supervisión',
+      'step2-p':       'LDA descompuso 60K documentos en 10 temas recurrentes — sin etiquetas impuestas. Cada artículo es una mezcla de los 10 temas.',
+      'step3-num':     '03 · Explora',
+      'step3-h':       'Observa el cambio en el discurso',
+      'step3-p':       'Presiona play o arrastra el slider. Cada celda es un tema; su tamaño indica qué proporción de la conversación ocupó ese mes.',
+      'topic-hint':    '← clic en un tema para explorarlo',
+      'd-empty':       'Haz clic en un tema para explorarlo',
+      'sec-proportion':'Proporción en el tiempo',
+      'sec-words':     'Palabras clave',
+      'sec-articles':  'Artículos representativos',
+      'show-more':     'Ver más artículos',
+      'macro-h':       'Superposición Macroeconómica',
+      'macro-p':       'Correlaciona las proporciones de temas con el IMACEC y el desempleo mensual.',
+      'macro-show':    'Mostrar superposición',
+      'macro-hide':    'Ocultar superposición',
+      'leg-imacec':    'IMACEC (actividad económica)',
+      'leg-unemp':     'Desempleo (%)',
+      'leg-topic':     'Tema seleccionado',
+      'method-h':      'Metodología',
+      'method-sub':    'Un pipeline NLP reproducible — desde HTML crudo hasta visualización interactiva — sin datos de entrenamiento etiquetados. Todo el código está <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">disponible</a>.',
+      'footer':        'Fabio Fuentes · Universidad Andrés Bello · 2025',
+    }
+  };
+
+  function applyLang(l) {
+    lang = l;
+    const S = STRINGS[l];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (S[key] !== undefined) el.textContent = S[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.dataset.i18nHtml;
+      if (S[key] !== undefined) el.innerHTML = S[key];
+    });
+    // Macro toggle text
+    const mt = document.getElementById('macro-toggle');
+    if (mt) mt.textContent = macroOn ? S['macro-hide'] : S['macro-show'];
+    // Re-render detail with language-aware labels
+    if (sel !== null) renderDetail(sel);
+  }
+
+  function setLang(l) {
+    lang = l;
+    document.getElementById('btn-en').style.background = l === 'en' ? 'var(--accent)' : 'var(--surface2)';
+    document.getElementById('btn-en').style.color      = l === 'en' ? '#fff' : 'var(--muted)';
+    document.getElementById('btn-es').style.background = l === 'es' ? 'var(--accent)' : 'var(--surface2)';
+    document.getElementById('btn-es').style.color      = l === 'es' ? '#fff' : 'var(--muted)';
+    applyLang(l);
   }
 
   // ═══════════════════════════════════════════════════════

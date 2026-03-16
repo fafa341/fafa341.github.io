@@ -4,7 +4,7 @@
     "label": "Government & Politics",
     "label_es": "Gobierno y Política",
     "description": "Presidential agenda, ministerial decisions, legislative bills, and executive-branch policy debates.",
-    "color": "#4e79a7",
+    "color": "#A8C5DA",
     "top_words": [
       "proyecto",
       "presidente",
@@ -29,7 +29,7 @@
     "label": "Labor & Society",
     "label_es": "Trabajo y Sociedad",
     "description": "Employment trends, women in the workforce, regional development, social services, and pandemic-era labor policy.",
-    "color": "#f28e2b",
+    "color": "#F7C59F",
     "top_words": [
       "región",
       "trabajo",
@@ -54,7 +54,7 @@
     "label": "Legal & Judiciary",
     "label_es": "Legal y Justicia",
     "description": "Court rulings, consumer rights, contract law, regulatory frameworks, and due-process debates.",
-    "color": "#e15759",
+    "color": "#F4A7A3",
     "top_words": [
       "ley",
       "tribunal",
@@ -79,7 +79,7 @@
     "label": "Monetary Policy",
     "label_es": "Política Monetaria",
     "description": "Central bank interest-rate decisions, inflation data, exchange rates, GDP growth, and macroeconomic forecasts.",
-    "color": "#76b7b2",
+    "color": "#A8D8C8",
     "top_words": [
       "tasa",
       "inflacion",
@@ -104,7 +104,7 @@
     "label": "International Trade",
     "label_es": "Comercio Internacional",
     "description": "Chile's trade relations with China, the US, and Europe; global markets, foreign investment, and geopolitical shifts.",
-    "color": "#59a14f",
+    "color": "#B5D5A0",
     "top_words": [
       "chino",
       "unido",
@@ -129,7 +129,7 @@
     "label": "Pension & Tax Reform",
     "label_es": "Reforma Previsional y Tributaria",
     "description": "AFP pension-system debates, tax legislation, Isapre health-fund reform, and fiscal redistribution proposals.",
-    "color": "#edc948",
+    "color": "#F9E4A0",
     "top_words": [
       "pensión",
       "impuesto",
@@ -154,7 +154,7 @@
     "label": "Macroeconomic Outlook",
     "label_es": "Perspectiva Macroeconómica",
     "description": "Broad economic outlooks — growth risks, investment climate, fiscal balance, and political-economy interactions.",
-    "color": "#b07aa1",
+    "color": "#D4B8D8",
     "top_words": [
       "gobierno",
       "banco",
@@ -179,7 +179,7 @@
     "label": "Investment & Energy",
     "label_es": "Inversión y Energía",
     "description": "Corporate investment announcements, energy infrastructure, electricity generation, and cross-border capital flows.",
-    "color": "#ff9da7",
+    "color": "#FFCDD2",
     "top_words": [
       "millón",
       "us",
@@ -204,7 +204,7 @@
     "label": "Mining & Resources",
     "label_es": "Minería y Recursos",
     "description": "Copper and lithium production, Codelco strategy, oil prices, mining regulation, and commodity market dynamics.",
-    "color": "#9c755f",
+    "color": "#D4BCA8",
     "top_words": [
       "precio",
       "minero",
@@ -229,7 +229,7 @@
     "label": "Corporate Finance",
     "label_es": "Negocios y Finanzas",
     "description": "Equity markets, mergers and acquisitions, banking sector, corporate earnings, and financial-market activity.",
-    "color": "#bab0ac",
+    "color": "#C8C8D8",
     "top_words": [
       "compania",
       "mercado",
