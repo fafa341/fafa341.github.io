@@ -639,6 +639,62 @@
     }
     .rn-paper-link:hover { background: var(--accent2); text-decoration: none; color: #fff; }
 
+    /* ── Word search ──────────────────────────────────────── */
+    #word-search {
+      margin: 48px 0 0;
+      border-top: 1px solid var(--border);
+      padding-top: 40px;
+    }
+    #word-search h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    #word-search .sub { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 640px; margin-bottom: 20px; }
+    #ws-input-wrap { position: relative; max-width: 400px; margin-bottom: 24px; }
+    #ws-input {
+      width: 100%; padding: 10px 14px;
+      border: 1px solid var(--border); border-radius: 8px;
+      font-size: 14px; font-family: var(--font);
+      background: var(--surface); color: var(--text);
+      outline: none; box-sizing: border-box;
+    }
+    #ws-input:focus { border-color: var(--accent); }
+    #ws-dropdown {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.08);
+      max-height: 220px; overflow-y: auto; z-index: 50;
+    }
+    #ws-dropdown.on { display: block; }
+    .ws-opt {
+      padding: 8px 14px; font-size: 13px; cursor: pointer;
+      color: var(--text);
+    }
+    .ws-opt:hover, .ws-opt.active { background: var(--surface2); }
+    .ws-opt em { font-style: normal; color: var(--accent); font-weight: 700; }
+    #ws-result { display: none; }
+    #ws-result.on { display: block; }
+    #ws-meta {
+      display: flex; align-items: center; flex-wrap: wrap;
+      gap: 8px; margin-bottom: 16px;
+    }
+    #ws-word-label {
+      font-size: 18px; font-weight: 700; color: var(--heading);
+    }
+    .ws-topic-chip {
+      font-size: 11px; padding: 3px 10px; border-radius: 12px;
+      border: 1px solid var(--border); color: var(--text);
+      font-weight: 600;
+    }
+    #ws-chart-wrap { margin-bottom: 12px; }
+    #ws-svg { width: 100%; display: block; overflow: visible; }
+    #ws-peak {
+      font-size: 12px; color: var(--muted); margin-top: 4px;
+    }
+    #ws-peak strong { color: var(--heading); }
+    #ws-no-result {
+      display: none; font-size: 13px; color: var(--muted);
+      margin-top: 8px;
+    }
+    #ws-no-result.on { display: block; }
+
     /* ── Footer ───────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
@@ -834,6 +890,27 @@
     </div>
 
     <!-- Methodology -->
+    <!-- Word search -->
+    <section id="word-search">
+      <h2 data-i18n="ws-h">Explore the Vocabulary</h2>
+      <p class="sub" data-i18n="ws-sub">Search any of the 10,000 lemmatised words in the corpus. The chart shows how strongly each word's discourse domain was present in Chilean economic media, year by year.</p>
+      <div id="ws-input-wrap">
+        <input id="ws-input" type="text" placeholder="e.g. cobre, inflación, litio, huelga…" autocomplete="off" spellcheck="false">
+        <div id="ws-dropdown"></div>
+      </div>
+      <div id="ws-no-result">No match found. Words are lemmatised Spanish (e.g. "pensión" not "pensiones").</div>
+      <div id="ws-result">
+        <div id="ws-meta">
+          <span id="ws-word-label"></span>
+          <div id="ws-topics"></div>
+        </div>
+        <div id="ws-chart-wrap">
+          <svg id="ws-svg"></svg>
+        </div>
+        <div id="ws-peak"></div>
+      </div>
+    </section>
+
     <section id="method">
       <h2 data-i18n="method-h">Methodology</h2>
       <p class="sub" data-i18n-html="method-sub">
@@ -1783,6 +1860,8 @@
       'leg-topic':          'Selected topic proportion',
       'yr-insight-label':   '✦ AI interpretation',
       'yr-no-data':         'No articles found for this year.',
+      'ws-h':          'Explore the Vocabulary',
+      'ws-sub':        'Search any of the 10,000 lemmatised words in the corpus. The chart shows how strongly each word\'s discourse domain was present in Chilean economic media, year by year.',
       'method-h':      'Methodology',
       'method-sub':    'A full reproducible NLP pipeline — from raw HTML to interactive visualization — without pre-labeled training data. All code is <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.',
       'footer':        'Fabio Fuentes · 2025',
@@ -1825,6 +1904,8 @@
       'macro-callout-body': ' Validamos la señal narrativa contra el IMACEC — el índice mensual de actividad de Chile. Esto confirma que el marco funciona. La ventaja real está en mapear temas latentes específicos a sus contrapartes sectoriales, reduciendo el ruido y precisando la señal causal.',
       'yr-insight-label':   '✦ Interpretación IA',
       'yr-no-data':         'No se encontraron artículos para este año.',
+      'ws-h':          'Explorar el Vocabulario',
+      'ws-sub':        'Busca cualquiera de las 10,000 palabras lematizadas del corpus. El gráfico muestra con qué intensidad estuvo presente el dominio discursivo de cada palabra en los medios económicos chilenos, año a año.',
       'method-h':      'Metodología',
       'method-sub':    'Un pipeline NLP reproducible — desde HTML crudo hasta visualización interactiva — sin datos de entrenamiento etiquetados. Todo el código está <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">disponible</a>.',
       'footer':        'Fabio Fuentes · 2025',
@@ -1869,6 +1950,194 @@
   // ═══════════════════════════════════════════════════════
   //  BOOT
   // ═══════════════════════════════════════════════════════
+  // ── Word search ──────────────────────────────────────────────────────────
+  (function() {
+    const YEARS = [2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+    const TOPIC_LABELS = [
+      'Government & Politics','Labor & Society','Legal & Judiciary','Monetary Policy',
+      'International Trade','Pension & Tax Reform','Macroeconomic Outlook',
+      'Investment & Energy','Mining & Resources','Corporate Finance'
+    ];
+    const TOPIC_COLORS = [
+      '#A8C5DA','#F7C59F','#F4A7A3','#A8D8C8','#B5D5A0',
+      '#F9E4A0','#D4B8D8','#FFCDD2','#D4BCA8','#C8C8D8'
+    ];
+
+    let wsData = null; // loaded lazily
+    let wsLoading = false;
+    let ddIdx = -1;  // dropdown keyboard nav
+
+    const input    = document.getElementById('ws-input');
+    const dropdown = document.getElementById('ws-dropdown');
+    const result   = document.getElementById('ws-result');
+    const noResult = document.getElementById('ws-no-result');
+
+    async function ensureLoaded() {
+      if (wsData) return true;
+      if (wsLoading) return false;
+      wsLoading = true;
+      try {
+        const r = await fetch('data/word_signals.json');
+        wsData = await r.json();
+        return true;
+      } catch(e) { wsLoading = false; return false; }
+    }
+
+    function highlight(text, query) {
+      const i = text.toLowerCase().indexOf(query.toLowerCase());
+      if (i < 0) return document.createTextNode(text);
+      const sp = document.createElement('span');
+      sp.appendChild(document.createTextNode(text.slice(0, i)));
+      const em = document.createElement('em'); em.textContent = text.slice(i, i + query.length);
+      sp.appendChild(em);
+      sp.appendChild(document.createTextNode(text.slice(i + query.length)));
+      return sp;
+    }
+
+    function showDropdown(words, query) {
+      dropdown.innerHTML = '';
+      ddIdx = -1;
+      if (!words.length) { dropdown.classList.remove('on'); return; }
+      words.slice(0, 12).forEach((w, i) => {
+        const div = document.createElement('div');
+        div.className = 'ws-opt';
+        div.dataset.idx = i;
+        div.appendChild(highlight(w, query));
+        div.addEventListener('mousedown', e => { e.preventDefault(); selectWord(w); });
+        dropdown.appendChild(div);
+      });
+      dropdown.classList.add('on');
+    }
+
+    function moveDd(dir) {
+      const opts = dropdown.querySelectorAll('.ws-opt');
+      if (!opts.length) return;
+      opts[ddIdx]?.classList.remove('active');
+      ddIdx = Math.max(0, Math.min(opts.length - 1, ddIdx + dir));
+      opts[ddIdx].classList.add('active');
+      opts[ddIdx].scrollIntoView({ block: 'nearest' });
+    }
+
+    function renderWordChart(word) {
+      if (!wsData || !(word in wsData)) {
+        result.classList.remove('on'); noResult.classList.add('on'); return;
+      }
+      noResult.classList.remove('on');
+      const sig = wsData[word];
+      const scores = sig.y;
+      const topTopics = sig.t;
+
+      // Meta
+      document.getElementById('ws-word-label').textContent = word;
+      const topicsEl = document.getElementById('ws-topics');
+      topicsEl.innerHTML = '';
+      topTopics.forEach(t => {
+        const chip = document.createElement('span');
+        chip.className = 'ws-topic-chip';
+        chip.style.background = TOPIC_COLORS[t] + '55';
+        chip.style.borderColor = TOPIC_COLORS[t];
+        chip.textContent = TOPIC_LABELS[t];
+        topicsEl.appendChild(chip);
+      });
+
+      // SVG bar chart
+      const svg = document.getElementById('ws-svg');
+      svg.innerHTML = '';
+      const W = svg.parentElement.clientWidth || 600;
+      const H = 140, padL = 4, padR = 4, padT = 24, padB = 28;
+      const chartW = W - padL - padR;
+      const chartH = H - padT - padB;
+      const barW = Math.floor(chartW / YEARS.length) - 2;
+      const maxV = Math.max(...scores);
+
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      svg.setAttribute('height', H);
+
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('transform', `translate(${padL},${padT})`);
+
+      // Bars
+      scores.forEach((v, i) => {
+        const bh = maxV > 0 ? (v / maxV) * chartH : 0;
+        const x = i * (chartW / YEARS.length) + 1;
+        const y = chartH - bh;
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x); rect.setAttribute('y', y);
+        rect.setAttribute('width', barW); rect.setAttribute('height', Math.max(bh, 1));
+        rect.setAttribute('rx', 3);
+        rect.setAttribute('fill', v === maxV ? 'var(--accent)' : 'var(--accent)');
+        rect.setAttribute('opacity', v === maxV ? '1' : '0.4');
+        // Year label
+        const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lbl.setAttribute('x', x + barW / 2); lbl.setAttribute('y', chartH + 16);
+        lbl.setAttribute('text-anchor', 'middle');
+        lbl.setAttribute('font-size', '10'); lbl.setAttribute('fill', 'var(--muted)');
+        lbl.textContent = YEARS[i];
+        g.appendChild(rect); g.appendChild(lbl);
+        // Value label on peak bar
+        if (v === maxV) {
+          const vlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          vlbl.setAttribute('x', x + barW / 2); vlbl.setAttribute('y', y - 4);
+          vlbl.setAttribute('text-anchor', 'middle');
+          vlbl.setAttribute('font-size', '10'); vlbl.setAttribute('font-weight', '700');
+          vlbl.setAttribute('fill', 'var(--accent)');
+          vlbl.textContent = 'peak';
+          g.appendChild(vlbl);
+        }
+      });
+      svg.appendChild(g);
+
+      // Peak year
+      const peakIdx = scores.indexOf(maxV);
+      const peakYear = YEARS[peakIdx];
+      document.getElementById('ws-peak').innerHTML =
+        `Peak presence: <strong>${peakYear}</strong> — largest share of discourse in that year belonged to topics where <em>${word}</em> is most prevalent.`;
+
+      result.classList.add('on');
+    }
+
+    async function selectWord(w) {
+      input.value = w;
+      dropdown.classList.remove('on');
+      await ensureLoaded();
+      renderWordChart(w);
+    }
+
+    let debounce = null;
+    input.addEventListener('input', async () => {
+      const q = input.value.trim();
+      noResult.classList.remove('on');
+      result.classList.remove('on');
+      if (q.length < 2) { dropdown.classList.remove('on'); return; }
+      const ok = await ensureLoaded();
+      if (!ok) return;
+      clearTimeout(debounce);
+      debounce = setTimeout(() => {
+        const matches = Object.keys(wsData).filter(w => w.startsWith(q)).sort();
+        const exact = matches.filter(w => w === q);
+        const rest  = matches.filter(w => w !== q);
+        showDropdown([...exact, ...rest], q);
+        if (exact.length) renderWordChart(q);
+      }, 120);
+    });
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); moveDd(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); moveDd(-1); }
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        const opts = dropdown.querySelectorAll('.ws-opt');
+        const chosen = ddIdx >= 0 && opts[ddIdx] ? opts[ddIdx].textContent : input.value.trim();
+        if (chosen) selectWord(chosen);
+      }
+      else if (e.key === 'Escape') { dropdown.classList.remove('on'); }
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#ws-input-wrap')) dropdown.classList.remove('on');
+    });
+  })();
+
   async function boot() {
     try {
       await load();
