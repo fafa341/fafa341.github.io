@@ -695,6 +695,53 @@
     }
     #ws-no-result.on { display: block; }
 
+    /* ── Limitations FAQ ──────────────────────────────────── */
+    #limitations {
+      margin: 48px 0 64px;
+      border-top: 1px solid var(--border);
+      padding-top: 40px;
+    }
+    #limitations h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    #limitations .sub { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 640px; margin-bottom: 24px; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 8px; margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 16px; cursor: pointer;
+      background: var(--surface);
+      font-size: 13px; font-weight: 600; color: var(--heading);
+      user-select: none; gap: 12px;
+    }
+    .faq-q:hover { background: var(--surface2); }
+    .faq-chevron {
+      flex-shrink: 0; font-size: 10px; color: var(--muted);
+      transition: transform 0.2s;
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-item.open .faq-q { background: var(--surface2); }
+    .faq-a {
+      display: none;
+      padding: 12px 16px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px; color: var(--text); line-height: 1.75;
+    }
+    .faq-item.open .faq-a { display: block; }
+    .faq-a strong { color: var(--heading); font-weight: 600; }
+    .faq-a em { font-style: italic; color: var(--muted); }
+    .faq-tag {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px; margin-right: 6px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .faq-tag.nlp  { background: #A8D8C8; color: #1a4a3a; }
+    .faq-tag.econ { background: #A8C5DA; color: #1a2e44; }
+    .faq-tag.data { background: #F9E4A0; color: #5a3e00; }
+    .faq-tag.method { background: #D4B8D8; color: #3a1a4a; }
+
     /* ── Footer ───────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
@@ -742,6 +789,7 @@
       <div class="hero-links">
         <a href="https://docs.google.com/document/d/1xqA7kIex1yJrXBbAT9yd6231NXWr-IRydU7ExGlB6vI/edit" target="_blank" rel="noopener" data-i18n="btn-paper">Read the paper ↗</a>
         <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener" data-i18n="btn-code">View code ↗</a>
+        <a href="#limitations" onclick="openLimitations()" data-i18n="btn-limits">Limitations &amp; FAQ ↓</a>
       </div>
       <div class="stats">
         <div>
@@ -872,7 +920,7 @@
     <div id="macro-section">
       <div class="macro-hdr">
         <h3 data-i18n="macro-h">Discourse Signal vs. Macroeconomic Outcomes</h3>
-        <p class="macro-sub" data-i18n="macro-p">News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal — and tests whether shifts in collective media attention lead macroeconomic outcomes.</p>
+        <p class="macro-sub" data-i18n="macro-p">News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal — and examines whether shifts in collective media attention Granger-predict macroeconomic outcomes.</p>
         <div class="macro-callout">
           <strong data-i18n="macro-callout-title">Benchmarking note:</strong>
           <span data-i18n="macro-callout-body"> We validated the narrative signal against IMACEC — Chile's broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.</span>
@@ -990,9 +1038,82 @@
         </div>
         <div class="m-card">
           <h4>Macro Correlation</h4>
-          <p>Monthly IMACEC and unemployment from Chile's Banco Central, overlaid to test whether discourse shifts lead macroeconomic conditions.</p>
+          <p>Monthly IMACEC and unemployment from Chile's Banco Central, overlaid to examine co-movement between narrative shifts and macroeconomic outcomes.</p>
         </div>
       </div>
+    </section>
+
+    <!-- Limitations FAQ -->
+    <section id="limitations">
+      <h2 data-i18n="limits-h">Limitations &amp; Frequently Asked Questions</h2>
+      <p class="sub" data-i18n="limits-sub">Honest answers to the questions a researcher or reviewer would ask. Knowing what a method cannot do is as important as knowing what it can.</p>
+
+      <div class="faq-item" id="faq-k">
+        <div class="faq-q" onclick="toggleFaq('faq-k')">
+          <span><span class="faq-tag nlp">NLP</span>Why K=10 topics? Could a different number change the findings?</span>
+          <span class="faq-chevron">▼</span>
+        </div>
+        <div class="faq-a">
+          <p>K=10 was selected after training and inspecting models across K=5 to K=15. The criterion was <strong>interpretability</strong>: the configuration that produced the clearest thematic separation and the most economically coherent clusters. No single formal coherence metric was used as the deciding criterion — this is standard practice in applied LDA work, where human validation of topic meaning matters as much as statistical scores.</p>
+          <p style="margin-top:8px">The implication: the specific topic boundaries are <strong>analytical choices, not objective facts</strong>. At K=8, Monetary Policy and Macroeconomic Outlook might merge; at K=15, Government &amp; Politics might split into executive and legislative sub-topics. The main econometric results focus on the Monetary Policy narrative, which consistently emerges as a distinct cluster across the evaluated range. The broader discourse structure — its shifts across elections, crises, and reforms — is robust to reasonable variation in K.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-causal">
+        <div class="faq-q" onclick="toggleFaq('faq-causal')">
+          <span><span class="faq-tag econ">Economics</span>Does this show that media narratives <em>cause</em> economic outcomes?</span>
+          <span class="faq-chevron">▼</span>
+        </div>
+        <div class="faq-a">
+          <p>Not in a strictly structural sense. The econometric model is a <strong>state-dependent Local Projection</strong> (Jordà 2005; Ramey &amp; Zubairy 2018), which establishes that narrative shocks at time <em>t</em> contain information about IMACEC outcomes at <em>t+h</em> not already captured by lags of the outcome itself — a <strong>Granger-causal</strong> relationship. The state variable is lagged one period to ensure predetermination, and placebo tests with randomly shuffled shocks confirm the results are not spurious.</p>
+          <p style="margin-top:8px">The reverse channel — that economic conditions drive media coverage — is equally plausible and not fully excluded. A structural causal claim would require an instrument or a natural experiment that shifts media narratives independently of underlying economic fundamentals. The correct interpretation is: <strong>narrative shifts contain predictive information about future economic activity</strong>, consistent with theories of expectation formation and Rational Inattention, but the causal direction is not fully identified.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-outlets">
+        <div class="faq-q" onclick="toggleFaq('faq-outlets')">
+          <span><span class="faq-tag data">Data</span>Do two outlets represent Chilean economic discourse?</span>
+          <span class="faq-chevron">▼</span>
+        </div>
+        <div class="faq-a">
+          <p>La Tercera and Biobío were selected from 14 candidate outlets on the basis of <strong>archive consistency and publication frequency</strong> — both maintained near-daily snapshots on the Wayback Machine across the full 2012–2024 window, a requirement for a valid monthly time series. La Tercera covers a centre-right, business-oriented readership; Biobío is a digital-native outlet with a broader urban audience.</p>
+          <p style="margin-top:8px">Left-leaning outlets (El Mostrador) and the dominant conservative business press (El Mercurio) are not included. The topic proportions and sentiment baseline therefore reflect the <strong>editorial priorities of these two specific outlets</strong>. Whether the results generalise to a more ideologically diverse corpus remains an open question. For a small open economy with a concentrated media market, however, the two outlets cover the majority of Chilean online economic news readership during this period.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-beto">
+        <div class="faq-q" onclick="toggleFaq('faq-beto')">
+          <span><span class="faq-tag nlp">NLP</span>Are the sentiment scores economically meaningful, or just linguistic?</span>
+          <span class="faq-chevron">▼</span>
+        </div>
+        <div class="faq-a">
+          <p>BETO was fine-tuned on a <strong>general Spanish-language sentiment dataset</strong>, not on financial or economic news specifically. The model captures <em>linguistic tone</em> — whether the language is positive or negative in a general sense — rather than <em>economic valence</em>. These can diverge: a technically-phrased article about a rate hike might read as neutral while being economically contractionary; a report on rising inflation might use alarmed language while describing conditions that were anticipated by markets.</p>
+          <p style="margin-top:8px">The sentiment variable should be interpreted as a proxy for <strong>the negative register of economic coverage</strong> — how worried or pessimistic the language sounds — not as a direct measure of economic optimism. Domain-specific fine-tuning on labelled Chilean financial articles would sharpen this distinction and is identified as a priority for future work.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-lda">
+        <div class="faq-q" onclick="toggleFaq('faq-lda')">
+          <span><span class="faq-tag method">Method</span>LDA destroys word order. Doesn't that matter for economics?</span>
+          <span class="faq-chevron">▼</span>
+        </div>
+        <div class="faq-a">
+          <p>Yes — and it is the central limitation of the topic modeling layer. LDA is a <strong>bag-of-words model</strong>: syntax, word order, and negation are discarded. "Banco Central <em>no</em> subió tasas" and "Banco Central <em>sí</em> subió tasas" produce identical feature representations. Direction — rates up or down, growth accelerating or slowing — is invisible at the LDA stage.</p>
+          <p style="margin-top:8px">This is why the BETO sentiment layer matters: it recovers the directional signal that LDA cannot. The two layers operate on different dimensions. LDA answers <em>what is being discussed</em>; BETO answers <em>how it is being discussed</em>. Together they capture the structure and tone of discourse — but neither fully captures propositional content in the way a modern contextual embedding model (e.g., a fine-tuned transformer) would. BERTopic or neural topic models would be a natural next step.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-ai">
+        <div class="faq-q" onclick="toggleFaq('faq-ai')">
+          <span><span class="faq-tag method">Method</span>The year interpretations are AI-generated — how much should I trust them?</span>
+          <span class="faq-chevron">▼</span>
+        </div>
+        <div class="faq-a">
+          <p>The year-by-year insights were generated <strong>offline</strong> using Claude Haiku (Anthropic), with each year's actual topic proportions, average sentiment, and key events as explicit inputs. They are pre-computed static content — no live API calls are made when you browse the site.</p>
+          <p style="margin-top:8px">Important caveat: the model has background knowledge of Chilean history. The interpretations integrate the quantitative corpus data with the model's prior knowledge of what happened in Chile between 2012 and 2024. They should be read as <strong>contextualised synthesis</strong> — a coherent narrative that connects the measured discourse structure to known historical events — not as independent empirical discoveries from the data alone. They are illustrative, not inferential.</p>
+        </div>
+      </div>
+
     </section>
 
   </div><!-- /.page -->
@@ -1833,6 +1954,9 @@
       'hero-subtitle': '60,000+ articles from <em>La Tercera</em> and <em>Biobío</em> (2012–2024), decomposed into 10 discourse topics via Latent Dirichlet Allocation. Explore how Chilean public conversation shifted across elections, protests, and economic crises.',
       'btn-paper':     'Read the paper ↗',
       'btn-code':      'View code ↗',
+      'btn-limits':    'Limitations & FAQ ↓',
+      'limits-h':      'Limitations & Frequently Asked Questions',
+      'limits-sub':    'Honest answers to the questions a researcher or reviewer would ask. Knowing what a method cannot do is as important as knowing what it can.',
       'lbl-articles':  'Articles',
       'lbl-months':    'Monthly snapshots',
       'lbl-topics':    'Topics found by LDA',
@@ -1852,7 +1976,7 @@
       'sec-articles':  'Representative articles',
       'show-more':     'Show more articles',
       'macro-h':            'Discourse Signal vs. Macroeconomic Outcomes',
-      'macro-p':            'News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal — and tests whether shifts in collective media attention lead macroeconomic outcomes.',
+      'macro-p':            'News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal — and examines whether shifts in collective media attention Granger-predict macroeconomic outcomes.',
       'macro-callout-title':'Benchmarking note:',
       'macro-callout-body': ' We validated the narrative signal against IMACEC — Chile\'s broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.',
       'leg-imacec':         'IMACEC (economic activity)',
@@ -1873,6 +1997,9 @@
       'hero-subtitle': 'Más de 60,000 artículos de <em>La Tercera</em> y <em>Biobío</em> (2012–2024), descompuestos en 10 temas discursivos mediante Asignación Latente de Dirichlet. Explora cómo la conversación pública chilena cambió entre elecciones, protestas y crisis económicas.',
       'btn-paper':     'Leer el artículo ↗',
       'btn-code':      'Ver código ↗',
+      'btn-limits':    'Limitaciones & FAQ ↓',
+      'limits-h':      'Limitaciones & Preguntas Frecuentes',
+      'limits-sub':    'Respuestas honestas a las preguntas que haría un revisor académico. Conocer qué no puede hacer un método es tan importante como saber qué puede hacer.',
       'lbl-articles':  'Artículos',
       'lbl-months':    'Instantáneas mensuales',
       'lbl-topics':    'Temas (LDA)',
@@ -2139,6 +2266,19 @@
       if (!e.target.closest('#ws-input-wrap')) dropdown.classList.remove('on');
     });
   })();
+
+  // ── Limitations FAQ ──────────────────────────────────────────────────────
+  function toggleFaq(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+  function openLimitations() {
+    setTimeout(() => {
+      const sec = document.getElementById('limitations');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // open all items
+      document.querySelectorAll('.faq-item').forEach(el => el.classList.add('open'));
+    }, 50);
+  }
 
   async function boot() {
     try {
