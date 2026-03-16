@@ -893,7 +893,7 @@
     <!-- Word search -->
     <section id="word-search">
       <h2 data-i18n="ws-h">Explore the Vocabulary</h2>
-      <p class="sub" data-i18n="ws-sub">Search any of the 10,000 lemmatised words in the corpus. The chart shows how strongly each word's discourse domain was present in Chilean economic media, year by year.</p>
+      <p class="sub" data-i18n="ws-sub">Search any of the 10,000 words in the corpus. The chart shows raw mention counts per year across 60,348 articles — how often each word actually appeared in Chilean economic media.</p>
       <div id="ws-input-wrap">
         <input id="ws-input" type="text" placeholder="e.g. cobre, inflación, litio, huelga…" autocomplete="off" spellcheck="false">
         <div id="ws-dropdown"></div>
@@ -1861,7 +1861,7 @@
       'yr-insight-label':   '✦ AI interpretation',
       'yr-no-data':         'No articles found for this year.',
       'ws-h':          'Explore the Vocabulary',
-      'ws-sub':        'Search any of the 10,000 lemmatised words in the corpus. The chart shows how strongly each word\'s discourse domain was present in Chilean economic media, year by year.',
+      'ws-sub':        'Search any of the 10,000 words in the corpus. The chart shows raw mention counts per year across 60,348 articles — how often each word actually appeared in Chilean economic media.',
       'method-h':      'Methodology',
       'method-sub':    'A full reproducible NLP pipeline — from raw HTML to interactive visualization — without pre-labeled training data. All code is <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.',
       'footer':        'Fabio Fuentes · 2025',
@@ -1905,7 +1905,7 @@
       'yr-insight-label':   '✦ Interpretación IA',
       'yr-no-data':         'No se encontraron artículos para este año.',
       'ws-h':          'Explorar el Vocabulario',
-      'ws-sub':        'Busca cualquiera de las 10,000 palabras lematizadas del corpus. El gráfico muestra con qué intensidad estuvo presente el dominio discursivo de cada palabra en los medios económicos chilenos, año a año.',
+      'ws-sub':        'Busca cualquiera de las 10,000 palabras del corpus. El gráfico muestra conteos reales de menciones por año en 60,348 artículos — cuántas veces apareció cada palabra en los medios económicos chilenos.',
       'method-h':      'Metodología',
       'method-sub':    'Un pipeline NLP reproducible — desde HTML crudo hasta visualización interactiva — sin datos de entrenamiento etiquetados. Todo el código está <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">disponible</a>.',
       'footer':        'Fabio Fuentes · 2025',
@@ -2024,7 +2024,7 @@
       }
       noResult.classList.remove('on');
       const sig = wsData[word];
-      const scores = sig.y;
+      const scores = sig.c;
       const topTopics = sig.t;
 
       // Meta
@@ -2074,14 +2074,14 @@
         lbl.setAttribute('font-size', '10'); lbl.setAttribute('fill', 'var(--muted)');
         lbl.textContent = YEARS[i];
         g.appendChild(rect); g.appendChild(lbl);
-        // Value label on peak bar
-        if (v === maxV) {
+        // Count label on peak bar
+        if (v === maxV && v > 0) {
           const vlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           vlbl.setAttribute('x', x + barW / 2); vlbl.setAttribute('y', y - 4);
           vlbl.setAttribute('text-anchor', 'middle');
           vlbl.setAttribute('font-size', '10'); vlbl.setAttribute('font-weight', '700');
           vlbl.setAttribute('fill', 'var(--accent)');
-          vlbl.textContent = 'peak';
+          vlbl.textContent = v.toLocaleString();
           g.appendChild(vlbl);
         }
       });
@@ -2090,8 +2090,10 @@
       // Peak year
       const peakIdx = scores.indexOf(maxV);
       const peakYear = YEARS[peakIdx];
-      document.getElementById('ws-peak').innerHTML =
-        `Peak presence: <strong>${peakYear}</strong> — largest share of discourse in that year belonged to topics where <em>${word}</em> is most prevalent.`;
+      const total = scores.reduce((a,b) => a+b, 0);
+      document.getElementById('ws-peak').innerHTML = maxV > 0
+        ? `Peak: <strong>${peakYear}</strong> with ${maxV.toLocaleString()} mentions · ${total.toLocaleString()} total across the corpus. <span style="color:var(--muted);font-style:italic">Raw counts from 60,348 articles; words matched as lemmatised Spanish forms.</span>`
+        : `<span style="color:var(--muted)">No mentions found. Try the base/lemmatised form (e.g. "pensión" not "pensiones", "realizar" not "realizó").</span>`;
 
       result.classList.add('on');
     }
