@@ -400,24 +400,21 @@
     /* ── Macro overlay ────────────────────────────────────── */
     #macro-section {
       margin-top: 14px;
-      background: #FFFBF0;
-      border: 1px solid #E8D99A;
-      border-left: 4px solid #D97706;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 10px; padding: 20px 22px;
-      box-shadow: 0 2px 10px rgba(217,119,6,.07);
     }
     .macro-hdr {
       margin-bottom: 10px;
     }
-    .macro-hdr h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .macro-hdr h3 { font-size: 16px; font-weight: 700; color: var(--heading); margin-bottom: 4px; }
     .macro-hdr .macro-sub { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
     .macro-callout {
-      background: #FEF3C7; border-left: 3px solid #D97706;
-      border-radius: 6px; padding: 10px 14px;
-      font-size: 12px; color: #92400E; line-height: 1.6;
-      margin-bottom: 14px;
+      font-size: 12px; color: var(--muted); line-height: 1.6;
+      margin-bottom: 14px; padding-left: 10px;
+      border-left: 2px solid var(--border);
     }
-    .macro-callout strong { font-weight: 700; }
+    .macro-callout strong { font-weight: 600; color: var(--text); }
     #macro-svg { width: 100%; display: block; overflow: visible; }
     .legend { display: flex; gap: 18px; margin-top: 8px; flex-wrap: wrap; }
     .leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
@@ -494,16 +491,27 @@
     }
     #method h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
     #method .sub { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 640px; margin-bottom: 20px; }
-    .pipeline {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; padding: 18px 20px;
-      font-family: var(--mono); font-size: 11px;
-      color: var(--muted); overflow-x: auto;
-      white-space: pre; line-height: 1.7;
-      margin-bottom: 24px;
+    /* Pipeline stepper */
+    .pipeline-steps {
+      display: flex; flex-direction: column; gap: 0;
+      margin-bottom: 28px;
     }
-    .hl { color: var(--accent2); }
-    .dim { color: var(--border); }
+    .pipe-step {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .pipe-step:last-child { border-bottom: none; }
+    .pipe-num {
+      flex-shrink: 0; width: 26px; height: 26px;
+      background: var(--accent); color: #fff;
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 11px; font-weight: 700;
+      margin-top: 1px;
+    }
+    .pipe-body { flex: 1; }
+    .pipe-label { font-size: 13px; font-weight: 700; color: var(--heading); margin-bottom: 2px; }
+    .pipe-desc  { font-size: 12px; color: var(--muted); line-height: 1.55; }
 
     .method-grid {
       display: grid;
@@ -512,26 +520,27 @@
     }
     .m-card {
       background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
       border-radius: 8px; padding: 14px;
     }
-    .m-card h4 { font-size: 13px; font-weight: 700; color: var(--accent2); margin-bottom: 5px; }
+    .m-card h4 { font-size: 13px; font-weight: 700; color: var(--heading); margin-bottom: 5px; }
     .m-card p  { font-size: 12px; color: var(--muted); line-height: 1.55; }
 
-    /* ── Research Note card + drawer ─────────────────────── */
+    /* ── Research Note banner ─────────────────────────────── */
     #rn-card {
-      position: fixed; bottom: 24px; right: 24px;
-      width: 220px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px;
-      padding: 14px 16px; box-shadow: 0 4px 20px rgba(0,0,0,.10);
-      z-index: 200; cursor: pointer;
-      transition: box-shadow 0.2s;
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px; padding: 14px 18px;
+      cursor: pointer; transition: background 0.15s;
     }
-    #rn-card:hover { box-shadow: 0 6px 28px rgba(0,0,0,.15); }
-    .rn-card-icon { font-size: 18px; margin-bottom: 6px; }
-    .rn-card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-    .rn-card-sub   { font-size: 11px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
-    .rn-card-link  { font-size: 11px; font-weight: 700; color: var(--accent); }
-    @media (max-width: 600px) { #rn-card { width: 170px; right: 12px; bottom: 12px; } }
+    #rn-card:hover { background: var(--surface2); }
+    .rn-card-icon { font-size: 20px; flex-shrink: 0; }
+    .rn-card-body { flex: 1; }
+    .rn-card-title { font-size: 13px; font-weight: 700; color: var(--heading); }
+    .rn-card-sub   { font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .rn-card-link  { flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--accent); white-space: nowrap; }
 
     /* Overlay */
     #rn-overlay {
@@ -734,11 +743,21 @@
       </div>
     </div>
 
+    <!-- Research Note banner -->
+    <div id="rn-card" onclick="document.getElementById('rn-overlay').classList.add('on')" role="button" tabindex="0">
+      <div class="rn-card-icon">📄</div>
+      <div class="rn-card-body">
+        <div class="rn-card-title">Signal in the Noise — Research Note</div>
+        <div class="rn-card-sub">Text as high-dimensional signal: three analytical layers toward causal inference in economics.</div>
+      </div>
+      <div class="rn-card-link">Read the note →</div>
+    </div>
+
     <!-- Macro overlay — always visible -->
     <div id="macro-section">
       <div class="macro-hdr">
         <h3 data-i18n="macro-h">Discourse Signal vs. Macroeconomic Outcomes</h3>
-        <p class="macro-sub" data-i18n="macro-p">Beyond GDP and inflation — can media narratives be quantified to explain how they steer sectors of an economy?</p>
+        <p class="macro-sub" data-i18n="macro-p">News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal — and tests whether shifts in collective media attention lead macroeconomic outcomes.</p>
         <div class="macro-callout">
           <strong data-i18n="macro-callout-title">Benchmarking note:</strong>
           <span data-i18n="macro-callout-body"> We validated the narrative signal against IMACEC — Chile's broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.</span>
@@ -764,33 +783,57 @@
         <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.
       </p>
 
-      <div class="pipeline"><span class="dim">┌──────────────────────────────────────────────────────────────────┐</span>
-<span class="dim">│</span>  <span class="hl">NLP PIPELINE</span>                                                     <span class="dim">│</span>
-<span class="dim">└──────────────────────────────────────────────────────────────────┘</span>
-
-  <span class="hl">Raw HTML</span>          web.archive.org · La Tercera + Biobío · 60,348 articles
-      │              Jan 2012 → Dec 2024
-      ▼
-  <span class="hl">Clean</span>             Remove boilerplate · decode \\uXXXX escapes
-      │              normalize unicode · strip copyright noise
-      ▼
-  <span class="hl">NLP</span>               Stanford Stanza · tokenization · lemmatization
-      │              POS tagging · Spanish named-entity recognition
-      ▼
-  <span class="hl">Feature Matrix</span>    TF-IDF bag-of-words · 10,000-term vocabulary
-      │              Sparse document-term matrix (60K × 10K)
-      ▼
-  <span class="hl">LDA</span>               K = 10 topics · sklearn · online learning
-      │              Document-topic matrix (60K × 10)
-      │              Topic-word matrix   (10 × 10K)
-      ▼
-  <span class="hl">Sentiment</span>         BETO (Spanish BERT) · positive / negative / neutral
-      │              Per-article labels + probability scores
-      ▼
-  <span class="hl">Aggregation</span>       Proportion-weighted monthly averages per topic
-      │              156 monthly snapshots · Banco Central macro overlay
-      ▼
-  <span class="hl">Visualization</span>     Vanilla JS · D3 v7 · Static JSON · GitHub Pages</div>
+      <div class="pipeline-steps">
+        <div class="pipe-step">
+          <div class="pipe-num">1</div>
+          <div class="pipe-body">
+            <div class="pipe-label">Raw HTML Corpus</div>
+            <div class="pipe-desc">web.archive.org · La Tercera + Biobío · 60,348 articles · Jan 2012 – Dec 2024</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">2</div>
+          <div class="pipe-body">
+            <div class="pipe-label">Text Cleaning</div>
+            <div class="pipe-desc">Remove boilerplate · decode Unicode escapes · normalize encoding · strip copyright noise</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">3</div>
+          <div class="pipe-body">
+            <div class="pipe-label">NLP — Stanford Stanza</div>
+            <div class="pipe-desc">Spanish tokenization · lemmatization · POS tagging · named-entity recognition</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">4</div>
+          <div class="pipe-body">
+            <div class="pipe-label">Feature Matrix</div>
+            <div class="pipe-desc">TF-IDF bag-of-words · 10,000-term vocabulary · sparse document-term matrix (60K × 10K)</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">5</div>
+          <div class="pipe-body">
+            <div class="pipe-label">LDA Topic Modeling</div>
+            <div class="pipe-desc">K = 10 topics · sklearn online LDA · document-topic matrix (60K × 10) · topic-word matrix (10 × 10K)</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">6</div>
+          <div class="pipe-body">
+            <div class="pipe-label">Sentiment — BETO</div>
+            <div class="pipe-desc">Spanish BERT fine-tuned on news · positive / negative / neutral labels + probability scores per article</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">7</div>
+          <div class="pipe-body">
+            <div class="pipe-label">Aggregation &amp; Visualization</div>
+            <div class="pipe-desc">Proportion-weighted monthly averages · 156 snapshots · Banco Central macro overlay · D3 v7 · GitHub Pages</div>
+          </div>
+        </div>
+      </div>
 
       <div class="method-grid">
         <div class="m-card">
@@ -817,14 +860,6 @@
     </section>
 
   </div><!-- /.page -->
-
-  <!-- Research Note sticky card -->
-  <div id="rn-card" onclick="document.getElementById('rn-overlay').classList.add('on')">
-    <div class="rn-card-icon">📄</div>
-    <div class="rn-card-title">Signal in the Noise</div>
-    <div class="rn-card-sub">Text as high-dimensional signal — three analytical layers toward causal inference.</div>
-    <div class="rn-card-link">Read the research note →</div>
-  </div>
 
   <!-- Research Note overlay / drawer -->
   <div id="rn-overlay" onclick="if(event.target===this)this.classList.remove('on')">
@@ -1658,7 +1693,7 @@
       'sec-articles':  'Representative articles',
       'show-more':     'Show more articles',
       'macro-h':            'Discourse Signal vs. Macroeconomic Outcomes',
-      'macro-p':            'Beyond GDP and inflation — can media narratives be quantified to explain how they steer sectors of an economy?',
+      'macro-p':            'News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal — and tests whether shifts in collective media attention lead macroeconomic outcomes.',
       'macro-callout-title':'Benchmarking note:',
       'macro-callout-body': ' We validated the narrative signal against IMACEC — Chile\'s broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.',
       'leg-imacec':         'IMACEC (economic activity)',
@@ -1703,7 +1738,7 @@
       'leg-unemp':     'Desempleo (%)',
       'leg-topic':          'Proporción del tema seleccionado',
       'macro-h':            'Señal Discursiva vs. Resultados Macroeconómicos',
-      'macro-p':            'Más allá del PIB e inflación — ¿pueden cuantificarse las narrativas mediáticas para explicar cómo orientan sectores de la economía?',
+      'macro-p':            'Las narrativas mediáticas pueden cuantificarse. Este proyecto destila 60.000 artículos en una señal discursiva medible — y contrasta si los cambios en la atención colectiva de los medios anticipan los resultados macroeconómicos.',
       'macro-callout-title':'Nota metodológica:',
       'macro-callout-body': ' Validamos la señal narrativa contra el IMACEC — el índice mensual de actividad de Chile. Esto confirma que el marco funciona. La ventaja real está en mapear temas latentes específicos a sus contrapartes sectoriales, reduciendo el ruido y precisando la señal causal.',
       'yr-insight-label':   '✦ Interpretación IA',
