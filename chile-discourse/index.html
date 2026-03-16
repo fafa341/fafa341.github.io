@@ -9,7 +9,7 @@
 
   <!-- D3 v7 -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"
-          integrity="sha256-OhCRRqelHGKNvPkdRqPqkNdJE8rh3d7VzKl8/tCXjbo="
+          integrity="sha256-8glLv2FBs1lyLE/kVOtsSw8OQswQzHr5IfwVj864ZTk="
           crossorigin="anonymous"></script>
 
   <style>
@@ -245,7 +245,8 @@
       background: var(--surface2); border: 1px solid var(--border);
       border-radius: 5px; padding: 5px 8px;
       font-size: 11px; color: var(--text);
-      white-space: nowrap; pointer-events: none;
+      white-space: normal; max-width: min(220px, 60vw);
+      pointer-events: none;
       opacity: 0; transition: opacity 0.15s; z-index: 50;
     }
     .epin:hover .epin-tip { opacity: 1; }
@@ -901,7 +902,10 @@
     const foot = document.createElement('div');
     foot.className = 'art-foot';
 
-    const sl = (a.sentiment_label || '').toLowerCase();
+    const SENT_MAP = {neu:'neutral', pos:'positive', neg:'negative',
+                     neutral:'neutral', positive:'positive', negative:'negative'};
+    const rawSl = (a.sentiment_label || '').toLowerCase();
+    const sl = SENT_MAP[rawSl] || rawSl;
     if (sl) {
       const b = document.createElement('span');
       b.className = `sbadge ${sl}`;
