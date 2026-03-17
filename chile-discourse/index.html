@@ -333,13 +333,61 @@
       overflow-y: auto;
       max-height: 80vh;
     }
-    #d-empty {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      height: 280px; color: var(--muted);
-      text-align: center; gap: 8px; font-size: 13px;
-    }
     #d-content { display: none; }
+
+    /* ── Topic grid (right panel) ─────────────────────────── */
+    #topic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+    .tg-cell {
+      border: 1.5px solid var(--border);
+      padding: 10px 12px 9px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .tg-top { display: flex; align-items: center; gap: 6px; }
+    .tg-swatch { width: 9px; height: 9px; flex-shrink: 0; }
+    .tg-name {
+      font-family: var(--font-ui); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.02em; color: var(--heading);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      line-height: 1.2;
+    }
+    .tg-pct {
+      font-family: var(--font-mono); font-size: 15px;
+      color: var(--heading); font-variant-numeric: tabular-nums;
+    }
+    .tg-bar-track { height: 2px; background: var(--border); }
+    .tg-bar-fill  { height: 100%; }
+
+    /* Shared hover tooltip */
+    #tg-tt {
+      position: fixed;
+      background: var(--surface);
+      border: 1px solid var(--border-mid);
+      padding: 10px 14px;
+      z-index: 400;
+      max-width: 230px;
+      pointer-events: none;
+      opacity: 0; transition: opacity 0.12s;
+      box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    }
+    #tg-tt.on { opacity: 1; }
+    .tg-tt-title {
+      font-family: var(--font-ui); font-size: 12px; font-weight: 700;
+      color: var(--heading); margin-bottom: 6px;
+    }
+    .tg-tt-words {
+      font-family: var(--font-mono); font-size: 10px;
+      color: var(--muted); line-height: 1.7;
+    }
 
     .d-hdr {
       display: flex; align-items: flex-start; gap: 9px;
@@ -951,15 +999,7 @@
       </div>
 
       <div id="detail">
-        <div id="d-empty">
-          <svg width="36" height="36" viewBox="0 0 40 40" fill="var(--border)">
-            <rect x="4" y="4" width="14" height="14" rx="2"/>
-            <rect x="22" y="4" width="14" height="8" rx="2"/>
-            <rect x="4" y="22" width="8" height="14" rx="2"/>
-            <rect x="16" y="22" width="20" height="14" rx="2"/>
-          </svg>
-          <span data-i18n="d-empty">Click a topic cell to explore it</span>
-        </div>
+        <div id="topic-grid"></div>
         <div id="d-content">
           <div class="d-hdr">
             <div class="d-dot" id="d-dot"></div>
@@ -1369,6 +1409,7 @@
     });
 
     cells.exit().remove();
+    renderTopicGrid(props);
   }
 
   const tmTT = document.getElementById('tm-tooltip');
@@ -1405,9 +1446,9 @@
         renderTmProps(avgProps);
         renderYearDetail(selYear, avgProps);
       } else {
-        document.getElementById('d-empty').style.display = 'flex';
         document.getElementById('d-content').style.display = 'none';
         renderTm(idx);
+        renderTopicGrid(proportions(idx));
       }
       renderMacro();
       return;
@@ -1422,7 +1463,9 @@
       renderTmProps(avgProps);
       renderYearDetail(selYear, avgProps);
     } else {
-      renderDetail(id); renderTm(idx);
+      renderDetail(id);
+      renderTm(idx);
+      renderTopicGrid(proportions(idx));
     }
     renderMacro();
   }
@@ -1430,7 +1473,6 @@
   function renderDetail(id) {
     const t = topics[id];
     const props = proportions(idx);
-    document.getElementById('d-empty').style.display = 'none';
     document.getElementById('d-content').style.display = 'block';
     document.getElementById('d-dot').style.background = t.color;
     document.getElementById('d-title').textContent = lang === 'es' ? t.label_es : t.label;
@@ -1448,6 +1490,54 @@
 
     renderSpark(id, t.color);
     renderArts(id);
+  }
+
+  // ═══════════════════════════════════════════════════════
+  //  TOPIC GRID
+  // ═══════════════════════════════════════════════════════
+  const _tgTt = document.getElementById('tg-tt');
+
+  function showTgTooltip(e, t) {
+    const r = e.currentTarget.getBoundingClientRect();
+    _tgTt.querySelector('.tg-tt-title').textContent = lang === 'es' ? t.label_es : t.label;
+    _tgTt.querySelector('.tg-tt-words').textContent = (t.top_words || []).slice(0, 8).join(' · ');
+    const ttH = 70;
+    let top = r.top - ttH - 10;
+    if (top < 8) top = r.bottom + 8;
+    let left = r.left;
+    if (left + 240 > window.innerWidth) left = window.innerWidth - 248;
+    _tgTt.style.top  = top  + 'px';
+    _tgTt.style.left = left + 'px';
+    _tgTt.classList.add('on');
+  }
+  function hideTgTooltip() { _tgTt.classList.remove('on'); }
+
+  function renderTopicGrid(props) {
+    const grid = document.getElementById('topic-grid');
+    if (!grid || !topics) return;
+    const maxP = Math.max(...props, 0.001);
+    grid.innerHTML = '';
+    topics.forEach((t, i) => {
+      const pct    = (props[i] * 100).toFixed(1);
+      const barPct = ((props[i] / maxP) * 100).toFixed(1);
+      const isSel  = sel === i;
+      const cell   = document.createElement('div');
+      cell.className = 'tg-cell' + (isSel ? ' selected' : '');
+      cell.style.background  = isSel ? t.color + '28' : t.color + '10';
+      cell.style.borderColor = isSel ? t.color : '';
+      if (isSel) cell.style.borderWidth = '2px';
+      cell.innerHTML =
+        `<div class="tg-top">` +
+          `<span class="tg-swatch" style="background:${t.color}"></span>` +
+          `<span class="tg-name">${lang === 'es' ? t.label_es : t.label}</span>` +
+        `</div>` +
+        `<div class="tg-pct">${pct}%</div>` +
+        `<div class="tg-bar-track"><div class="tg-bar-fill" style="width:${barPct}%;background:${t.color}"></div></div>`;
+      cell.addEventListener('click',      ()  => selectTopic(i));
+      cell.addEventListener('mouseenter', (e) => showTgTooltip(e, t));
+      cell.addEventListener('mouseleave',      hideTgTooltip);
+      grid.appendChild(cell);
+    });
   }
 
   // ═══════════════════════════════════════════════════════
@@ -1918,11 +2008,11 @@
       g.select('.tm-label-sub').attr('x',7).attr('y',mid+14).text(h>44?`${d.data.pct}%`:'');
     });
     cells.exit().remove();
+    renderTopicGrid(props);
   }
 
   function renderYearDetail(yr, avgProps) {
     // Show d-content panel with year-specific data
-    document.getElementById('d-empty').style.display   = 'none';
     document.getElementById('d-content').style.display = 'block';
 
     // Use the selected topic if one is active, otherwise fall back to dominant
@@ -2150,6 +2240,9 @@
     // (macro is always visible no toggle)
     // Re-render detail with language-aware labels
     if (sel !== null) renderDetail(sel);
+    renderTopicGrid(viewMode === 'year' && selYear
+      ? (() => { const prefix=`${selYear}-`; const rows=T.proportions.filter((_,i)=>T.months[i].startsWith(prefix)); return rows.length ? Array.from({length:10},(_,t)=>rows.reduce((s,r)=>s+(r[t]||0),0)/rows.length) : proportions(idx); })()
+      : proportions(idx));
   }
 
   function setLang(l) {
@@ -2428,5 +2521,12 @@
 
   boot();
   </script>
+
+  <!-- Shared topic-grid hover tooltip -->
+  <div id="tg-tt">
+    <div class="tg-tt-title"></div>
+    <div class="tg-tt-words"></div>
+  </div>
+
 </body>
 </html>
