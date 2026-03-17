@@ -275,8 +275,8 @@
       margin-top: 4px;
     }
     .epin:hover .epin-vline { opacity: 0.9; }
-    /* Hover card tooltip */
-    .epin-tip {
+    /* Shared event-pin hover card (body-level, avoids transform stacking context) */
+    #epin-tt {
       position: fixed;
       background: var(--surface); border: 1px solid var(--border-mid);
       border-top: 2px solid #D97706;
@@ -284,20 +284,20 @@
       font-family: var(--font-ui); font-size: 13px; color: var(--text); line-height: 1.6;
       min-width: 240px; max-width: 320px;
       pointer-events: none;
-      opacity: 0; transition: opacity 0.15s; z-index: 200;
+      opacity: 0; transition: opacity 0.15s; z-index: 500;
       box-shadow: 0 6px 24px rgba(0,0,0,.12);
     }
-    .epin:hover .epin-tip { opacity: 1; }
-    .epin-tip-title {
+    #epin-tt.on { opacity: 1; }
+    #epin-tt-title {
       font-family: var(--font-ui); font-size: 11px; font-weight: 700;
       letter-spacing: 0.08em; text-transform: uppercase;
       color: #D97706; margin-bottom: 5px;
     }
-    .epin-tip-date {
+    #epin-tt-date {
       font-family: var(--font-mono); font-size: 10px; color: var(--muted);
       margin-bottom: 6px;
     }
-    .epin-tip-desc {
+    #epin-tt-desc {
       font-family: var(--font-body); font-size: 13px; color: var(--text); line-height: 1.65;
     }
 
@@ -511,9 +511,10 @@
       letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
       margin-bottom: 8px;
     }
-    #macro-topic-col #topic-grid { grid-template-columns: 1fr; }
-    #macro-topic-col .tg-cell { padding: 7px 10px 6px; }
-    #macro-topic-col .tg-pct  { font-size: 13px; }
+    #macro-topic-col #topic-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+    #macro-topic-col .tg-cell { aspect-ratio: 1; padding: 0; border-width: 2px; border-color: transparent; }
+    #macro-topic-col .tg-cell.selected { border-color: var(--text); }
+    #macro-topic-col .tg-top, #macro-topic-col .tg-pct, #macro-topic-col .tg-bar-track { display: none; }
     @media (max-width: 860px) {
       #macro-body { grid-template-columns: 1fr; }
     }
@@ -1653,10 +1654,12 @@
   // ═══════════════════════════════════════════════════════
   const _tgTt = document.getElementById('tg-tt');
 
-  function showTgTooltip(e, t) {
+  function showTgTooltip(e, t, pctLabel) {
     const r = e.currentTarget.getBoundingClientRect();
     _tgTt.querySelector('.tg-tt-title').textContent = lang === 'es' ? t.label_es : t.label;
-    _tgTt.querySelector('.tg-tt-words').textContent = (t.top_words || []).slice(0, 8).join(' · ');
+    _tgTt.querySelector('.tg-tt-words').textContent = pctLabel != null
+      ? pctLabel
+      : (t.top_words || []).slice(0, 8).join(' · ');
     const ttH = 70;
     let top = r.top - ttH - 10;
     if (top < 8) top = r.bottom + 8;
@@ -1671,6 +1674,7 @@
   function renderTopicGrid(props) {
     const grid = document.getElementById('topic-grid');
     if (!grid || !topics) return;
+    const isCompact = !!grid.closest('#macro-topic-col');
     const maxP = Math.max(...props, 0.001);
     grid.innerHTML = '';
     topics.forEach((t, i) => {
@@ -1679,18 +1683,23 @@
       const isSel  = sel === i;
       const cell   = document.createElement('div');
       cell.className = 'tg-cell' + (isSel ? ' selected' : '');
-      cell.style.background  = isSel ? t.color + '28' : t.color + '10';
-      cell.style.borderColor = isSel ? t.color : '';
-      if (isSel) cell.style.borderWidth = '2px';
-      cell.innerHTML =
-        `<div class="tg-top">` +
-          `<span class="tg-swatch" style="background:${t.color}"></span>` +
-          `<span class="tg-name">${lang === 'es' ? t.label_es : t.label}</span>` +
-        `</div>` +
-        `<div class="tg-pct">${pct}%</div>` +
-        `<div class="tg-bar-track"><div class="tg-bar-fill" style="width:${barPct}%;background:${t.color}"></div></div>`;
+      if (isCompact) {
+        cell.style.background = t.color;
+        cell.style.opacity    = isSel ? '1' : '0.72';
+      } else {
+        cell.style.background  = isSel ? t.color + '28' : t.color + '10';
+        cell.style.borderColor = isSel ? t.color : '';
+        if (isSel) cell.style.borderWidth = '2px';
+        cell.innerHTML =
+          `<div class="tg-top">` +
+            `<span class="tg-swatch" style="background:${t.color}"></span>` +
+            `<span class="tg-name">${lang === 'es' ? t.label_es : t.label}</span>` +
+          `</div>` +
+          `<div class="tg-pct">${pct}%</div>` +
+          `<div class="tg-bar-track"><div class="tg-bar-fill" style="width:${barPct}%;background:${t.color}"></div></div>`;
+      }
       cell.addEventListener('click',      ()  => selectTopic(i));
-      cell.addEventListener('mouseenter', (e) => showTgTooltip(e, t));
+      cell.addEventListener('mouseenter', (e) => showTgTooltip(e, t, isCompact ? pct + '%' : null));
       cell.addEventListener('mouseleave',      hideTgTooltip);
       grid.appendChild(cell);
     });
@@ -1860,6 +1869,7 @@
 
   function buildPins() {
     const cont = document.getElementById('event-pins');
+    const epinTt = document.getElementById('epin-tt');
     const total = T.months.length - 1;
     (T.key_events||[]).forEach(ev => {
       const ei = T.months.indexOf(ev.month);
@@ -1876,36 +1886,24 @@
       const vline = document.createElement('div');
       vline.className = 'epin-vline';
 
-      // Hover card (positioned via JS to avoid viewport clipping)
-      const tip = document.createElement('div');
-      tip.className = 'epin-tip';
-      const tipTitle = document.createElement('div');
-      tipTitle.className = 'epin-tip-title';
-      tipTitle.textContent = ev.label;
-      const tipDate = document.createElement('div');
-      tipDate.className = 'epin-tip-date';
-      tipDate.textContent = ev.month;
-      const tipDesc = document.createElement('div');
-      tipDesc.className = 'epin-tip-desc';
-      tipDesc.textContent = ev.description;
-      tip.appendChild(tipTitle);
-      tip.appendChild(tipDate);
-      tip.appendChild(tipDesc);
-
       pin.appendChild(marker);
       pin.appendChild(vline);
-      pin.appendChild(tip);
 
-      // Position tooltip on hover to avoid viewport edges
+      // Use shared body-level tooltip (avoids transform stacking context bug)
       pin.addEventListener('mouseenter', () => {
-        const r = pin.getBoundingClientRect();
+        document.getElementById('epin-tt-title').textContent = ev.label;
+        document.getElementById('epin-tt-date').textContent  = ev.month;
+        document.getElementById('epin-tt-desc').textContent  = ev.description;
+        const r   = marker.getBoundingClientRect();
         const ttW = 280;
-        let left = r.left - ttW / 2;
+        let left = r.left + r.width / 2 - ttW / 2;
         left = Math.max(8, Math.min(left, window.innerWidth - ttW - 8));
-        tip.style.left  = left + 'px';
-        tip.style.top   = (r.top - 10) + 'px';
-        tip.style.transform = 'translateY(-100%)';
+        epinTt.style.left      = left + 'px';
+        epinTt.style.top       = (r.top - 10) + 'px';
+        epinTt.style.transform = 'translateY(-100%)';
+        epinTt.classList.add('on');
       });
+      pin.addEventListener('mouseleave', () => epinTt.classList.remove('on'));
 
       pin.addEventListener('click', () => { stopAnim(); goTo(ei); });
       cont.appendChild(pin);
@@ -2703,6 +2701,13 @@
   <div id="tg-tt">
     <div class="tg-tt-title"></div>
     <div class="tg-tt-words"></div>
+  </div>
+
+  <!-- Shared event-pin hover tooltip (body-level to avoid transform stacking context) -->
+  <div id="epin-tt">
+    <div id="epin-tt-title"></div>
+    <div id="epin-tt-date"></div>
+    <div id="epin-tt-desc"></div>
   </div>
 
 </body>
