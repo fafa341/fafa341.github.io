@@ -44,7 +44,7 @@
       --mono:       var(--font-mono);
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
     h1, h2, h3, h4, .nav-title { color: var(--heading); font-family: var(--font-disp); font-weight: 400; }
     body {
       background: var(--bg);
@@ -702,12 +702,18 @@
       border: 1px solid var(--border); color: var(--text);
       font-weight: 600;
     }
-    #ws-chart-wrap { margin-bottom: 12px; }
+    #ws-chart-wrap {
+      margin-bottom: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px 20px 0;
+    }
     #ws-svg { width: 100%; display: block; overflow: visible; }
     #ws-peak {
-      font-size: 12px; color: var(--muted); margin-top: 4px;
+      font-family: var(--font-body); font-size: 13px; color: var(--muted);
+      margin-top: 10px; line-height: 1.6;
     }
-    #ws-peak strong { color: var(--heading); }
+    #ws-peak strong { color: var(--heading); font-family: var(--font-mono); }
     #ws-no-result {
       display: none; font-size: 13px; color: var(--muted);
       margin-top: 8px;
@@ -765,8 +771,6 @@
     #app-layout {
       display: grid;
       grid-template-columns: 220px 1fr;
-      max-width: 1200px;
-      margin: 0 auto;
       align-items: start;
     }
     #sidebar {
@@ -775,7 +779,7 @@
       height: 100vh;
       overflow-y: auto;
       border-right: 1px solid var(--border);
-      padding: 32px 20px 32px;
+      padding: 40px 24px 32px 28px;
       display: flex;
       flex-direction: column;
     }
@@ -803,8 +807,8 @@
     .toc-meta p { font-family: var(--font-ui); font-size: 11px; color: var(--muted); margin-bottom: 6px; line-height: 1.5; }
     .toc-meta a { font-family: var(--font-ui); font-size: 12px; color: var(--accent); display: block; margin-bottom: 4px; }
     #main-content { min-width: 0; }
-    #main-content .page { max-width: 900px; padding: 0 32px; }
-    .chapter { padding-top: 56px; padding-bottom: 48px; border-bottom: 1px solid var(--border); }
+    #main-content .page { max-width: 860px; padding: 0 56px; }
+    .chapter { padding-top: 64px; padding-bottom: 56px; border-bottom: 1px solid var(--border); scroll-snap-align: start; }
     .chapter:last-child { border-bottom: none; }
     @media (max-width: 860px) {
       #app-layout { grid-template-columns: 1fr; }
@@ -818,7 +822,7 @@
       .toc-item { padding: 4px 8px; border-left: none; border-bottom: 2px solid transparent; font-size: 12px; }
       .toc-item.active { border-bottom-color: var(--accent); border-left-color: transparent; }
       .toc-meta { display: none; }
-      #main-content .page { padding: 0 16px; }
+      #main-content .page { padding: 0 20px; }
       .chapter { padding-top: 36px; }
     }
 
@@ -2283,10 +2287,10 @@
       const svg = document.getElementById('ws-svg');
       svg.innerHTML = '';
       const W = svg.parentElement.clientWidth || 600;
-      const H = 140, padL = 4, padR = 4, padT = 24, padB = 28;
+      const H = 160, padL = 4, padR = 4, padT = 28, padB = 32;
       const chartW = W - padL - padR;
       const chartH = H - padT - padB;
-      const barW = Math.floor(chartW / YEARS.length) - 2;
+      const barW = Math.max(Math.floor(chartW / YEARS.length) - 3, 4);
       const maxV = Math.max(...scores);
 
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -2294,6 +2298,13 @@
 
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       g.setAttribute('transform', `translate(${padL},${padT})`);
+
+      // Baseline
+      const base = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      base.setAttribute('x1', 0); base.setAttribute('x2', chartW);
+      base.setAttribute('y1', chartH); base.setAttribute('y2', chartH);
+      base.setAttribute('stroke', 'var(--border-mid)'); base.setAttribute('stroke-width', '1');
+      g.appendChild(base);
 
       // Bars
       scores.forEach((v, i) => {
@@ -2303,23 +2314,27 @@
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.setAttribute('x', x); rect.setAttribute('y', y);
         rect.setAttribute('width', barW); rect.setAttribute('height', Math.max(bh, 1));
-        rect.setAttribute('rx', 3);
-        rect.setAttribute('fill', v === maxV ? 'var(--accent)' : 'var(--accent)');
-        rect.setAttribute('opacity', v === maxV ? '1' : '0.4');
+        rect.setAttribute('rx', 0);
+        rect.setAttribute('fill', 'var(--accent)');
+        rect.setAttribute('opacity', v === maxV ? '1' : '0.35');
         // Year label
         const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        lbl.setAttribute('x', x + barW / 2); lbl.setAttribute('y', chartH + 16);
+        lbl.setAttribute('x', x + barW / 2); lbl.setAttribute('y', chartH + 18);
         lbl.setAttribute('text-anchor', 'middle');
-        lbl.setAttribute('font-size', '10'); lbl.setAttribute('fill', 'var(--muted)');
+        lbl.setAttribute('font-size', '10');
+        lbl.setAttribute('font-family', 'var(--font-mono)');
+        lbl.setAttribute('fill', 'var(--muted)');
         lbl.textContent = YEARS[i];
         g.appendChild(rect); g.appendChild(lbl);
         // Count label on peak bar
         if (v === maxV && v > 0) {
           const vlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          vlbl.setAttribute('x', x + barW / 2); vlbl.setAttribute('y', y - 4);
+          vlbl.setAttribute('x', x + barW / 2); vlbl.setAttribute('y', y - 6);
           vlbl.setAttribute('text-anchor', 'middle');
-          vlbl.setAttribute('font-size', '10'); vlbl.setAttribute('font-weight', '700');
-          vlbl.setAttribute('fill', 'var(--accent)');
+          vlbl.setAttribute('font-size', '10');
+          vlbl.setAttribute('font-family', 'var(--font-mono)');
+          vlbl.setAttribute('font-weight', '500');
+          vlbl.setAttribute('fill', 'var(--accent2)');
           vlbl.textContent = v.toLocaleString();
           g.appendChild(vlbl);
         }
