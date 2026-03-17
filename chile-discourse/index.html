@@ -505,11 +505,13 @@
       gap: 18px;
       align-items: start;
     }
+    #macro-chart-col { min-width: 0; }
     #macro-topic-col .toc-label {
       font-family: var(--font-ui); font-size: 10px; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
       margin-bottom: 8px;
     }
+    #macro-topic-col #topic-grid { grid-template-columns: 1fr; }
     #macro-topic-col .tg-cell { padding: 7px 10px 6px; }
     #macro-topic-col .tg-pct  { font-size: 13px; }
     @media (max-width: 860px) {
@@ -540,6 +542,66 @@
       opacity: 0; transition: opacity 0.1s; z-index: 20;
     }
     #macro-tt.on { opacity: 1; }
+
+    /* ── Macro interpretation card ────────────────────────── */
+    #macro-interp {
+      margin-top: 22px;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+    }
+    #macro-interp-hdr {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 16px; cursor: pointer; user-select: none;
+    }
+    #macro-interp-hdr:hover .mi-caret { color: var(--accent2); }
+    .mi-prompt { display: flex; align-items: flex-start; gap: 10px; flex: 1; }
+    .mi-icon { color: var(--accent); font-size: 13px; flex-shrink: 0; margin-top: 3px; }
+    .mi-q-main {
+      font-family: var(--font-disp); font-size: 17px; font-weight: 400;
+      color: var(--heading); margin-bottom: 3px; line-height: 1.3;
+    }
+    .mi-q-sub {
+      font-family: var(--font-body); font-size: 14px; color: var(--muted); line-height: 1.6;
+    }
+    .mi-caret {
+      font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--accent); white-space: nowrap; flex-shrink: 0;
+      margin-top: 4px; transition: color 0.15s;
+    }
+    #macro-interp-body {
+      display: none;
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    #macro-interp:not(.open) #macro-interp-body { display: none; }
+    #macro-interp.open #macro-interp-body { display: grid; }
+    #macro-interp.open .mi-caret::after { content: ' ↑'; }
+    #macro-interp:not(.open) .mi-caret::after { content: ' ↓'; }
+    .mi-claim {
+      display: flex; gap: 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 16px 18px;
+    }
+    .mi-claim-num {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+      color: var(--accent); flex-shrink: 0; margin-top: 2px; letter-spacing: 0.04em;
+    }
+    .mi-claim-title {
+      font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--heading); margin-bottom: 8px;
+    }
+    .mi-claim-body {
+      font-family: var(--font-body); font-size: 14px; color: var(--text);
+      line-height: 1.75;
+    }
+    .mi-claim-body em { font-style: italic; color: var(--accent2); }
+    @media (max-width: 700px) {
+      #macro-interp-body { grid-template-columns: 1fr; }
+    }
 
     /* ── Year mode ────────────────────────────────────────── */
     #view-toggle {
@@ -1129,6 +1191,37 @@
           </div>
         </div>
       </div>
+
+      <!-- Interpretation accordion -->
+      <div id="macro-interp">
+        <div id="macro-interp-hdr" onclick="document.getElementById('macro-interp').classList.toggle('open')">
+          <div class="mi-prompt">
+            <span class="mi-icon">✦</span>
+            <div>
+              <div class="mi-q-main">Can you detect patterns?</div>
+              <div class="mi-q-sub">Which sectoral sub-index would you compare this discourse signal with? What does the co-movement between narrative shifts and economic outcomes suggest?</div>
+            </div>
+          </div>
+          <span class="mi-caret">Read the interpretation</span>
+        </div>
+        <div id="macro-interp-body">
+          <div class="mi-claim">
+            <div class="mi-claim-num">01</div>
+            <div>
+              <div class="mi-claim-title">What the evidence supports</div>
+              <p class="mi-claim-body">Discourse shifts contain predictive information about future economic activity. A state-dependent Local Projection (Jordà 2005) shows narrative shocks Granger-predict IMACEC outcomes beyond what lags of IMACEC itself explain. Placebo tests with shuffled shocks confirm the result is not spurious. This is consistent with theories of expectation formation and <em>Rational Inattention</em>.</p>
+            </div>
+          </div>
+          <div class="mi-claim">
+            <div class="mi-claim-num">02</div>
+            <div>
+              <div class="mi-claim-title">What remains open</div>
+              <p class="mi-claim-body">The reverse channel — that economic conditions drive media coverage — is equally plausible and not fully excluded. A structural causal claim would require an instrument that shifts narratives independently of underlying economic fundamentals. The correct read: <em>predictive signal, not identified cause</em>. Causal direction is not fully identified.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     </section><!-- /#ch-macro -->
@@ -1853,9 +1946,10 @@
   //  MACRO CHART (always visible)
   // ═══════════════════════════════════════════════════════
   function renderMacro() {
-    const section = document.getElementById('macro-section');
-    const W = section.clientWidth - 44;
-    const H = 230, ml=36, mr=14, mt=12, mb=28;
+    const chartCol = document.getElementById('macro-chart-col');
+    const section  = document.getElementById('macro-section');
+    const W = chartCol && chartCol.clientWidth > 0 ? chartCol.clientWidth : section.clientWidth - 44;
+    const H = 240, ml=40, mr=18, mt=12, mb=28;
     const iW = W-ml-mr, iH = H-mt-mb;
     const sv = d3.select('#macro-svg');
     sv.selectAll('*').remove();
