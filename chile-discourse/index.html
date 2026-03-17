@@ -222,7 +222,7 @@
 
     #slider-wrap {
       position: relative;
-      padding-top: 44px;
+      padding-top: 64px;
     }
     #slider {
       width: 100%; -webkit-appearance: none; appearance: none;
@@ -247,7 +247,7 @@
     }
     #event-pins {
       position: absolute; top: 0; left: 0; right: 0;
-      height: 48px; pointer-events: none;
+      height: 64px; pointer-events: none;
     }
     .epin {
       position: absolute; transform: translateX(-50%);
@@ -255,30 +255,51 @@
       display: flex; flex-direction: column; align-items: center;
       pointer-events: all; cursor: pointer;
     }
-    .epin-lbl {
-      font-size: 8px; font-weight: 600;
-      color: var(--yellow); white-space: nowrap;
-      text-align: center; line-height: 1; margin-bottom: 3px;
+    /* Diamond marker at the top of each pin */
+    .epin-marker {
+      width: 7px; height: 7px;
+      background: #D97706;
+      transform: rotate(45deg);
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .epin:hover .epin-marker {
+      transform: rotate(45deg) scale(1.5);
+      background: #B45309;
     }
     .epin-vline {
-      width: 1.5px; flex: 1;
-      background: var(--yellow); opacity: 0.55;
+      width: 1px; flex: 1;
+      background: #D97706; opacity: 0.4;
       transition: opacity 0.15s;
+      margin-top: 4px;
     }
-    .epin:hover .epin-vline { opacity: 1; }
+    .epin:hover .epin-vline { opacity: 0.9; }
+    /* Hover card tooltip */
     .epin-tip {
-      position: absolute; bottom: calc(100% + 6px); left: 50%;
-      transform: translateX(-50%);
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 0; padding: 10px 14px;
-      font-size: 12px; color: var(--text); line-height: 1.55;
-      white-space: normal; min-width: 260px; max-width: min(340px, 85vw);
+      position: fixed;
+      background: var(--surface); border: 1px solid var(--border-mid);
+      border-top: 2px solid #D97706;
+      padding: 12px 16px;
+      font-family: var(--font-ui); font-size: 13px; color: var(--text); line-height: 1.6;
+      min-width: 240px; max-width: 320px;
       pointer-events: none;
-      opacity: 0; transition: opacity 0.15s; z-index: 50;
-      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+      opacity: 0; transition: opacity 0.15s; z-index: 200;
+      box-shadow: 0 6px 24px rgba(0,0,0,.12);
     }
     .epin:hover .epin-tip { opacity: 1; }
-    .epin-tip-title { font-weight: 700; margin-bottom: 4px; color: var(--yellow); }
+    .epin-tip-title {
+      font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: #D97706; margin-bottom: 5px;
+    }
+    .epin-tip-date {
+      font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .epin-tip-desc {
+      font-family: var(--font-body); font-size: 13px; color: var(--text); line-height: 1.65;
+    }
 
     /* ── Main viz layout ──────────────────────────────────── */
     #viz-grid {
@@ -871,7 +892,7 @@
     .toc-meta p { font-family: var(--font-ui); font-size: 11px; color: var(--muted); margin-bottom: 6px; line-height: 1.5; }
     .toc-meta a { font-family: var(--font-ui); font-size: 12px; color: var(--accent); display: block; margin-bottom: 4px; }
     #main-content { min-width: 0; }
-    #main-content .page { max-width: 960px; padding: 0 64px; }
+    #main-content .page { max-width: 1140px; padding: 0 48px; }
     .chapter { padding-top: 80px; padding-bottom: 64px; border-bottom: 1px solid var(--border); scroll-snap-align: start; }
     .chapter:last-child { border-bottom: none; }
     @media (max-width: 860px) {
@@ -1754,29 +1775,45 @@
       pin.className = 'epin';
       pin.style.left = (ei/total*100)+'%';
 
-      // Tooltip (shown on hover)
-      const tip = document.createElement('div');
-      tip.className = 'epin-tip';
-      const title = document.createElement('div');
-      title.className = 'epin-tip-title';
-      title.textContent = ev.label;
-      const desc = document.createElement('div');
-      desc.textContent = ev.description;
-      tip.appendChild(title);
-      tip.appendChild(desc);
+      // Diamond marker
+      const marker = document.createElement('div');
+      marker.className = 'epin-marker';
 
-      // Short label above the vertical line
-      const lbl = document.createElement('div');
-      lbl.className = 'epin-lbl';
-      lbl.textContent = ev.label;
-
-      // Vertical line striking through the slider area
+      // Vertical line
       const vline = document.createElement('div');
       vline.className = 'epin-vline';
 
-      pin.appendChild(tip);
-      pin.appendChild(lbl);
+      // Hover card (positioned via JS to avoid viewport clipping)
+      const tip = document.createElement('div');
+      tip.className = 'epin-tip';
+      const tipTitle = document.createElement('div');
+      tipTitle.className = 'epin-tip-title';
+      tipTitle.textContent = ev.label;
+      const tipDate = document.createElement('div');
+      tipDate.className = 'epin-tip-date';
+      tipDate.textContent = ev.month;
+      const tipDesc = document.createElement('div');
+      tipDesc.className = 'epin-tip-desc';
+      tipDesc.textContent = ev.description;
+      tip.appendChild(tipTitle);
+      tip.appendChild(tipDate);
+      tip.appendChild(tipDesc);
+
+      pin.appendChild(marker);
       pin.appendChild(vline);
+      pin.appendChild(tip);
+
+      // Position tooltip on hover to avoid viewport edges
+      pin.addEventListener('mouseenter', () => {
+        const r = pin.getBoundingClientRect();
+        const ttW = 280;
+        let left = r.left - ttW / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - ttW - 8));
+        tip.style.left  = left + 'px';
+        tip.style.top   = (r.top - 10) + 'px';
+        tip.style.transform = 'translateY(-100%)';
+      });
+
       pin.addEventListener('click', () => { stopAnim(); goTo(ei); });
       cont.appendChild(pin);
     });
@@ -2308,20 +2345,22 @@
     }, { threshold: 0.2 });
     document.querySelectorAll('.intro-step').forEach(s => stepIo.observe(s));
 
-    // TOC active state — highlight current chapter
+    // TOC active state — scroll-position based (reliable for variable-height chapters)
     const tocItems = document.querySelectorAll('.toc-item');
-    if (tocItems.length) {
-      const chapterIo = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            const id = e.target.id;
-            tocItems.forEach(a => {
-              a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-            });
-          }
+    const chapters = Array.from(document.querySelectorAll('.chapter'));
+    if (tocItems.length && chapters.length) {
+      function updateActiveToc() {
+        const triggerY = window.innerHeight * 0.25; // top 25% of viewport
+        let activeId = chapters[0].id; // default to first
+        chapters.forEach(ch => {
+          if (ch.getBoundingClientRect().top <= triggerY) activeId = ch.id;
         });
-      }, { threshold: 0.25, rootMargin: '-10% 0px -60% 0px' });
-      document.querySelectorAll('.chapter').forEach(ch => chapterIo.observe(ch));
+        tocItems.forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + activeId);
+        });
+      }
+      window.addEventListener('scroll', updateActiveToc, { passive: true });
+      updateActiveToc(); // run once on load
     }
   }
 
