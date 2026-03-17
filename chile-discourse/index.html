@@ -153,19 +153,23 @@
     .intro-steps {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
       margin: 32px 0;
-    }
-    .intro-step {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 18px;
+    }
+    .intro-step {
+      padding: 18px 20px;
+      border-right: 1px solid var(--border);
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 0.5s, transform 0.5s;
     }
+    .intro-step:last-child { border-right: none; }
     .intro-step.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 660px) {
+      .intro-step { border-right: none; border-bottom: 1px solid var(--border); }
+      .intro-step:last-child { border-bottom: none; }
+    }
     .step-num {
       font-size: 10px; font-weight: 700;
       color: var(--accent); letter-spacing: 0.1em;
@@ -402,7 +406,7 @@
       margin-top: 14px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px; padding: 20px 22px;
+      border-radius: 0; padding: 20px 22px;
     }
     .macro-hdr {
       margin-bottom: 10px;
@@ -520,8 +524,7 @@
     }
     .m-card {
       background: var(--surface); border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      border-radius: 8px; padding: 14px;
+      border-radius: 0; padding: 14px;
     }
     .m-card h4 { font-size: 13px; font-weight: 700; color: var(--heading); margin-bottom: 5px; }
     .m-card p  { font-size: 12px; color: var(--muted); line-height: 1.55; }
@@ -578,7 +581,7 @@
       margin-top: 12px;
       background: var(--surface); border: 1px solid var(--border);
       border-left: 3px solid var(--accent);
-      border-radius: 8px; padding: 14px 18px;
+      border-radius: 0; padding: 14px 18px;
       cursor: pointer; transition: background 0.15s;
     }
     #rn-card:hover { background: var(--surface2); }
@@ -780,11 +783,8 @@
     <header class="hero">
       <div class="eyebrow" data-i18n="eyebrow">Undergraduate Thesis · 2025</div>
       <h1 data-i18n-html="hero-h1">How <em>Chile talked to itself</em><br>over 12 years of news</h1>
-      <p class="subtitle" data-i18n-html="hero-subtitle">
-        60,000+ articles from <em>La Tercera</em> and <em>Biobío</em> (2012–2024), decomposed into
-        10 discourse topics via Latent Dirichlet Allocation. Explore how
-        Chilean public conversation shifted across elections, protests,
-        and economic crises.
+      <p class="subtitle" data-i18n="hero-subtitle">
+        60,000+ articles from La Tercera and Biobío (2012–2024), decomposed into 10 consistent narratives. Explore how Chilean public conversation shifted across elections, protests, and economic crises.
       </p>
       <div class="hero-links">
         <a href="https://docs.google.com/document/d/1xqA7kIex1yJrXBbAT9yd6231NXWr-IRydU7ExGlB6vI/edit" target="_blank" rel="noopener" data-i18n="btn-paper">Read the paper ↗</a>
@@ -804,10 +804,6 @@
           <div class="stat-val">10</div>
           <div class="stat-lbl" data-i18n="lbl-topics">Topics found by LDA</div>
         </div>
-        <div>
-          <div class="stat-val" id="s-months">156</div>
-          <div class="stat-lbl" data-i18n="lbl-months">Monthly snapshots</div>
-        </div>
       </div>
     </header>
 
@@ -816,12 +812,12 @@
       <div class="intro-step">
         <div class="step-num" data-i18n="step1-num">01 · Corpus</div>
         <h3 data-i18n="step1-h">12 years of economic journalism</h3>
-        <p data-i18n-html="step1-p">Articles from <em>La Tercera</em> and <em>Biobío</em>'s business sections were archived via the Wayback Machine, spanning four presidential terms.</p>
+        <p data-i18n="step1-p">Articles from La Tercera and Biobío's business sections were scraped from the web via the Wayback Machine archives, spanning four presidential terms.</p>
       </div>
       <div class="intro-step">
         <div class="step-num" data-i18n="step2-num">02 · Model</div>
         <h3 data-i18n="step2-h">10 topics, discovered unsupervised</h3>
-        <p data-i18n="step2-p">LDA decomposed 60K documents into 10 recurring themes no labels imposed. Each article is a soft mix of all 10 topics.</p>
+        <p data-i18n="step2-p">A machine learning model (LDA) decomposed 60K documents into 10 recurring themes with no labels imposed. Each article is a mix of all 10 topics.</p>
       </div>
       <div class="intro-step">
         <div class="step-num" data-i18n="step3-num">03 · Explore</div>
@@ -1508,7 +1504,7 @@
     const el = document.getElementById('year-labels');
     const years = [...new Set(T.months.map(m=>m.slice(0,4)))];
     years.forEach(yr => { const s=document.createElement('span'); s.textContent=yr; el.appendChild(s); });
-    document.getElementById('s-months').textContent = T.months.length;
+    // s-months stat removed from UI
   }
 
   function buildPins() {
@@ -1951,7 +1947,7 @@
       'nav-title':     'Chilean Discourse · 2012–2024',
       'eyebrow':       'Undergraduate Thesis · 2025',
       'hero-h1':       'How <em>Chile talked to itself</em><br>over 12 years of news',
-      'hero-subtitle': '60,000+ articles from <em>La Tercera</em> and <em>Biobío</em> (2012–2024), decomposed into 10 discourse topics via Latent Dirichlet Allocation. Explore how Chilean public conversation shifted across elections, protests, and economic crises.',
+      'hero-subtitle': '60,000+ articles from La Tercera and Biobío (2012–2024), decomposed into 10 consistent narratives. Explore how Chilean public conversation shifted across elections, protests, and economic crises.',
       'btn-paper':     'Read the paper ↗',
       'btn-code':      'View code ↗',
       'btn-limits':    'Limitations & FAQ ↓',
@@ -1962,10 +1958,10 @@
       'lbl-topics':    'Topics found by LDA',
       'step1-num':     '01 · Corpus',
       'step1-h':       '12 years of economic journalism',
-      'step1-p':       'Articles from <em>La Tercera</em> and <em>Biobío</em>\'s business sections were archived via the Wayback Machine, spanning four presidential terms.',
+      'step1-p':       'Articles from La Tercera and Biobío\'s business sections were scraped from the web via the Wayback Machine archives, spanning four presidential terms.',
       'step2-num':     '02 · Model',
       'step2-h':       '10 topics, discovered unsupervised',
-      'step2-p':       'LDA decomposed 60K documents into 10 recurring themes no labels imposed. Each article is a soft mix of all 10 topics.',
+      'step2-p':       'A machine learning model (LDA) decomposed 60K documents into 10 recurring themes with no labels imposed. Each article is a mix of all 10 topics.',
       'step3-num':     '03 · Explore',
       'step3-h':       'Watch the discourse shift',
       'step3-p':       'Press play or drag the slider. Each cell represents a topic; its size shows how much of the conversation it occupied that month.',
