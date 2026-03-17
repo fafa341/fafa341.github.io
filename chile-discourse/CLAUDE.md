@@ -54,3 +54,13 @@ Everything lives in one file: `index.html` (~2300 lines of HTML + CSS + vanilla 
 ### Bilingual support
 
 All human-facing strings are defined in a `STRINGS` object with `en` / `es` keys. `setLang(lang)` swaps the active language and re-renders text nodes.
+
+## Design System
+
+Always read [DESIGN.md](DESIGN.md) before making any visual or UI decisions. All font choices, colors, spacing, and aesthetic direction are defined there. Do not deviate without explicit user approval. In QA mode, flag any code that doesn't match DESIGN.md.
+
+Key tokens at a glance:
+- Fonts: Hedvig Letters Serif (display) · Source Serif 4 (body) · DM Sans (UI) · Geist Mono (data)
+- Accent: `#2558A8` · Accent deep: `#1A3F7A` · Background: `#F8F5F0` · Text: `#1C1917`
+- Border radius: `0` everywhere (squared edges, no exceptions)
+- Layout target: two-column sticky nav + scroll-snap chapters (Anthropic Economic Index pattern)
