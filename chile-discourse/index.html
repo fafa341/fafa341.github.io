@@ -333,9 +333,15 @@
       overflow-y: auto;
       max-height: 80vh;
     }
+    #d-empty {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 260px; color: var(--muted);
+      text-align: center; gap: 8px; font-size: 13px;
+    }
     #d-content { display: none; }
 
-    /* ── Topic grid (right panel) ─────────────────────────── */
+    /* ── Topic grid ───────────────────────────────────────── */
     #topic-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -471,6 +477,22 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 0; padding: 20px 22px;
+    }
+    #macro-body {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    #macro-topic-col .toc-label {
+      font-family: var(--font-ui); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 8px;
+    }
+    #macro-topic-col .tg-cell { padding: 7px 10px 6px; }
+    #macro-topic-col .tg-pct  { font-size: 13px; }
+    @media (max-width: 860px) {
+      #macro-body { grid-template-columns: 1fr; }
     }
     .macro-hdr {
       margin-bottom: 10px;
@@ -891,8 +913,8 @@
     <div class="page" style="max-width:none;padding:0 24px;">
       <a class="home-link" href="..">← Fabio Fuentes</a>
       <div id="lang-toggle" style="margin-left:auto;display:flex;gap:0;border:1px solid var(--border);border-radius:0;overflow:hidden;flex-shrink:0;">
-        <button id="btn-en" onclick="setLang('en')" style="padding:4px 10px;font-size:12px;font-weight:600;font-family:var(--font-ui);border:none;cursor:pointer;background:var(--accent);color:#fff;transition:background 0.15s;">EN</button>
-        <button id="btn-es" onclick="setLang('es')" style="padding:4px 10px;font-size:12px;font-weight:600;font-family:var(--font-ui);border:none;cursor:pointer;background:var(--surface2);color:var(--muted);transition:background 0.15s;">ES</button>
+        <button id="btn-en" data-lang-btn="en" onclick="setLang('en')" style="padding:4px 10px;font-size:12px;font-weight:600;font-family:var(--font-ui);border:none;cursor:pointer;background:var(--accent);color:#fff;transition:background 0.15s;">EN</button>
+        <button id="btn-es" data-lang-btn="es" onclick="setLang('es')" style="padding:4px 10px;font-size:12px;font-weight:600;font-family:var(--font-ui);border:none;cursor:pointer;background:var(--surface2);color:var(--muted);transition:background 0.15s;">ES</button>
       </div>
     </div>
   </nav>
@@ -910,6 +932,10 @@
         <p>Undergraduate Thesis · 2025</p>
         <a href="https://docs.google.com/document/d/1xqA7kIex1yJrXBbAT9yd6231NXWr-IRydU7ExGlB6vI/edit" target="_blank" rel="noopener" data-i18n="btn-paper">Read the paper ↗</a>
         <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener" data-i18n="btn-code">View code ↗</a>
+        <div style="display:flex;gap:0;border:1px solid var(--border);overflow:hidden;margin-top:12px;width:fit-content;">
+          <button data-lang-btn="en" onclick="setLang('en')" style="padding:4px 12px;font-size:11px;font-weight:700;font-family:var(--font-ui);border:none;cursor:pointer;background:var(--accent);color:#fff;letter-spacing:0.05em;transition:background 0.15s;">EN</button>
+          <button data-lang-btn="es" onclick="setLang('es')" style="padding:4px 12px;font-size:11px;font-weight:700;font-family:var(--font-ui);border:none;cursor:pointer;background:var(--surface2);color:var(--muted);letter-spacing:0.05em;transition:background 0.15s;">ES</button>
+        </div>
       </div>
     </aside>
     <main id="main-content">
@@ -999,7 +1025,15 @@
       </div>
 
       <div id="detail">
-        <div id="topic-grid"></div>
+        <div id="d-empty">
+          <svg width="36" height="36" viewBox="0 0 40 40" fill="var(--border)">
+            <rect x="4" y="4" width="14" height="14"/>
+            <rect x="22" y="4" width="14" height="8"/>
+            <rect x="4" y="22" width="8" height="14"/>
+            <rect x="16" y="22" width="20" height="14"/>
+          </svg>
+          <span data-i18n="d-empty">Click a topic cell to explore it</span>
+        </div>
         <div id="d-content">
           <div class="d-hdr">
             <div class="d-dot" id="d-dot"></div>
@@ -1057,14 +1091,22 @@
           <span data-i18n="macro-callout-body"> We validated the narrative signal against IMACEC Chile's broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.</span>
         </div>
       </div>
-      <div id="macro-chart-wrap" style="position:relative;">
-        <svg id="macro-svg"></svg>
-        <div id="macro-tt"></div>
-      </div>
-      <div class="legend">
-        <div class="leg-item"><div class="leg-sw" style="background:#D97706"></div><span data-i18n="leg-imacec">IMACEC (economic activity)</span></div>
-        <div class="leg-item"><div class="leg-sw" style="background:#DC2626"></div><span data-i18n="leg-unemp">Unemployment (%)</span></div>
-        <div class="leg-item"><div class="leg-sw" id="leg-topic" style="background:#A8C5DA"></div><span data-i18n="leg-topic">Selected topic proportion</span></div>
+      <div id="macro-body">
+        <div id="macro-topic-col">
+          <div class="toc-label">Select topic</div>
+          <div id="topic-grid"></div>
+        </div>
+        <div id="macro-chart-col">
+          <div id="macro-chart-wrap" style="position:relative;">
+            <svg id="macro-svg"></svg>
+            <div id="macro-tt"></div>
+          </div>
+          <div class="legend">
+            <div class="leg-item"><div class="leg-sw" style="background:#D97706"></div><span data-i18n="leg-imacec">IMACEC (economic activity)</span></div>
+            <div class="leg-item"><div class="leg-sw" style="background:#DC2626"></div><span data-i18n="leg-unemp">Unemployment (%)</span></div>
+            <div class="leg-item"><div class="leg-sw" id="leg-topic" style="background:#A8C5DA"></div><span data-i18n="leg-topic">Selected topic proportion</span></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1446,9 +1488,9 @@
         renderTmProps(avgProps);
         renderYearDetail(selYear, avgProps);
       } else {
+        document.getElementById('d-empty').style.display = 'flex';
         document.getElementById('d-content').style.display = 'none';
         renderTm(idx);
-        renderTopicGrid(proportions(idx));
       }
       renderMacro();
       return;
@@ -1465,7 +1507,6 @@
     } else {
       renderDetail(id);
       renderTm(idx);
-      renderTopicGrid(proportions(idx));
     }
     renderMacro();
   }
@@ -1473,6 +1514,7 @@
   function renderDetail(id) {
     const t = topics[id];
     const props = proportions(idx);
+    document.getElementById('d-empty').style.display = 'none';
     document.getElementById('d-content').style.display = 'block';
     document.getElementById('d-dot').style.background = t.color;
     document.getElementById('d-title').textContent = lang === 'es' ? t.label_es : t.label;
@@ -2013,6 +2055,7 @@
 
   function renderYearDetail(yr, avgProps) {
     // Show d-content panel with year-specific data
+    document.getElementById('d-empty').style.display   = 'none';
     document.getElementById('d-content').style.display = 'block';
 
     // Use the selected topic if one is active, otherwise fall back to dominant
@@ -2247,10 +2290,11 @@
 
   function setLang(l) {
     lang = l;
-    document.getElementById('btn-en').style.background = l === 'en' ? 'var(--accent)' : 'var(--surface2)';
-    document.getElementById('btn-en').style.color      = l === 'en' ? '#fff' : 'var(--muted)';
-    document.getElementById('btn-es').style.background = l === 'es' ? 'var(--accent)' : 'var(--surface2)';
-    document.getElementById('btn-es').style.color      = l === 'es' ? '#fff' : 'var(--muted)';
+    document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+      const active = btn.dataset.langBtn === l;
+      btn.style.background = active ? 'var(--accent)' : 'var(--surface2)';
+      btn.style.color      = active ? '#fff' : 'var(--muted)';
+    });
     applyLang(l);
   }
 
