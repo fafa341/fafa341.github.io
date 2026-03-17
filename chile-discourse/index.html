@@ -1824,8 +1824,8 @@
     document.getElementById('d-empty').style.display   = 'none';
     document.getElementById('d-content').style.display = 'block';
 
-    // Dominant topic for year
-    const domIdx   = avgProps.indexOf(Math.max(...avgProps));
+    // Use the selected topic if one is active, otherwise fall back to dominant
+    const domIdx   = (sel !== null) ? sel : avgProps.indexOf(Math.max(...avgProps));
     const domTopic = topics[domIdx];
 
     document.getElementById('d-dot').style.background   = domTopic.color;
