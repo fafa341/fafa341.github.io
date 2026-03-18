@@ -1169,7 +1169,7 @@
     <div id="macro-section">
       <div class="macro-hdr">
         <h3 data-i18n="macro-h">Discourse Signal vs. Macroeconomic Outcomes</h3>
-        <p class="macro-sub" data-i18n="macro-p">News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal and examines whether shifts in collective media attention Granger-predict macroeconomic outcomes.</p>
+        <p class="macro-sub" data-i18n="macro-p">News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal and explores whether shifts in collective media attention move alongside macroeconomic outcomes.</p>
         <div class="macro-callout">
           <strong data-i18n="macro-callout-title">Benchmarking note:</strong>
           <span data-i18n="macro-callout-body"> We validated the narrative signal against IMACEC Chile's broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.</span>
@@ -1199,8 +1199,8 @@
           <div class="mi-prompt">
             <span class="mi-icon">✦</span>
             <div>
-              <div class="mi-q-main">Can you detect patterns?</div>
-              <div class="mi-q-sub">Which sectoral sub-index would you compare this discourse signal with? What does the co-movement between narrative shifts and economic outcomes suggest?</div>
+              <div class="mi-q-main">Do you notice anything?</div>
+              <div class="mi-q-sub">Which economic indicator would you compare this signal with? What does the co-movement suggest to you?</div>
             </div>
           </div>
           <span class="mi-caret">Read the interpretation</span>
@@ -1209,15 +1209,15 @@
           <div class="mi-claim">
             <div class="mi-claim-num">01</div>
             <div>
-              <div class="mi-claim-title">What the evidence supports</div>
-              <p class="mi-claim-body">Discourse shifts contain predictive information about future economic activity. A state-dependent Local Projection (Jordà 2005) shows narrative shocks Granger-predict IMACEC outcomes beyond what lags of IMACEC itself explain. Placebo tests with shuffled shocks confirm the result is not spurious. This is consistent with theories of expectation formation and <em>Rational Inattention</em>.</p>
+              <div class="mi-claim-title">What the data shows</div>
+              <p class="mi-claim-body">When media attention shifts toward a topic, economic indicators tend to move in the same direction shortly after. Narrative patterns contain information about future activity that the economic series alone does not fully capture. This fits with how expectations work: what people read and discuss shapes what they anticipate, and anticipation shapes behavior.</p>
             </div>
           </div>
           <div class="mi-claim">
             <div class="mi-claim-num">02</div>
             <div>
-              <div class="mi-claim-title">What remains open</div>
-              <p class="mi-claim-body">The reverse channel — that economic conditions drive media coverage — is equally plausible and not fully excluded. A structural causal claim would require an instrument that shifts narratives independently of underlying economic fundamentals. The correct read: <em>predictive signal, not identified cause</em>. Causal direction is not fully identified.</p>
+              <div class="mi-claim-title">What we cannot fully claim</div>
+              <p class="mi-claim-body">The arrow could point the other way too. Economic conditions likely shape what the media covers, and that channel is not ruled out here. To make a stronger causal claim, you would need a way to shift media narratives independently of what is happening in the economy. What this shows is a <em>predictive signal, not a proven cause</em>.</p>
             </div>
           </div>
         </div>
@@ -1652,12 +1652,12 @@
   // ═══════════════════════════════════════════════════════
   //  TOPIC GRID
   // ═══════════════════════════════════════════════════════
-  const _tgTt = document.getElementById('tg-tt');
-
   function showTgTooltip(e, t, pctLabel) {
+    const tt = document.getElementById('tg-tt');
+    if (!tt) return;
     const r = e.currentTarget.getBoundingClientRect();
-    _tgTt.querySelector('.tg-tt-title').textContent = lang === 'es' ? t.label_es : t.label;
-    _tgTt.querySelector('.tg-tt-words').textContent = pctLabel != null
+    tt.querySelector('.tg-tt-title').textContent = lang === 'es' ? t.label_es : t.label;
+    tt.querySelector('.tg-tt-words').textContent = pctLabel != null
       ? pctLabel
       : (t.top_words || []).slice(0, 8).join(' · ');
     const ttH = 70;
@@ -1665,11 +1665,11 @@
     if (top < 8) top = r.bottom + 8;
     let left = r.left;
     if (left + 240 > window.innerWidth) left = window.innerWidth - 248;
-    _tgTt.style.top  = top  + 'px';
-    _tgTt.style.left = left + 'px';
-    _tgTt.classList.add('on');
+    tt.style.top  = top  + 'px';
+    tt.style.left = left + 'px';
+    tt.classList.add('on');
   }
-  function hideTgTooltip() { _tgTt.classList.remove('on'); }
+  function hideTgTooltip() { const tt = document.getElementById('tg-tt'); if (tt) tt.classList.remove('on'); }
 
   function renderTopicGrid(props) {
     const grid = document.getElementById('topic-grid');
@@ -2339,7 +2339,7 @@
       'sec-articles':  'Representative articles',
       'show-more':     'Show more articles',
       'macro-h':            'Discourse Signal vs. Macroeconomic Outcomes',
-      'macro-p':            'News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal and examines whether shifts in collective media attention Granger-predict macroeconomic outcomes.',
+      'macro-p':            'News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal and explores whether shifts in collective media attention move alongside macroeconomic outcomes.',
       'macro-callout-title':'Benchmarking note:',
       'macro-callout-body': ' We validated the narrative signal against IMACEC Chile\'s broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.',
       'leg-imacec':         'IMACEC (economic activity)',
@@ -2385,7 +2385,7 @@
       'leg-unemp':     'Desempleo (%)',
       'leg-topic':          'Proporción del tema seleccionado',
       'macro-h':            'Señal Discursiva vs. Resultados Macroeconómicos',
-      'macro-p':            'Las narrativas mediáticas pueden cuantificarse. Este proyecto destila 60.000 artículos en una señal discursiva medible y contrasta si los cambios en la atención colectiva de los medios anticipan los resultados macroeconómicos.',
+      'macro-p':            'Las narrativas mediáticas pueden cuantificarse. Este proyecto destila 60.000 artículos en una señal discursiva medible y explora si los cambios en la atención colectiva de los medios se mueven junto a los resultados macroeconómicos.',
       'macro-callout-title':'Nota metodológica:',
       'macro-callout-body': ' Validamos la señal narrativa contra el IMACEC el índice mensual de actividad de Chile. Esto confirma que el marco funciona. La ventaja real está en mapear temas latentes específicos a sus contrapartes sectoriales, reduciendo el ruido y precisando la señal causal.',
       'yr-insight-label':   '✦ Interpretación IA',
