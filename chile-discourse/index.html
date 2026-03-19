@@ -1029,9 +1029,9 @@
     <!-- Hero -->
     <header class="hero">
       <div class="eyebrow" data-i18n="eyebrow">Undergraduate Thesis · 2025</div>
-      <h1 data-i18n-html="hero-h1">How <em>Chile talked to itself</em><br>over 12 years of news</h1>
+      <h1 data-i18n-html="hero-h1">The news predicts the economy.<br>But only <em>when everyone is already watching.</em></h1>
       <p class="subtitle" data-i18n="hero-subtitle">
-        60,000+ articles from La Tercera and Biobío (2012–2024), decomposed into 10 consistent narratives. Explore how Chilean public conversation shifted across elections, protests, and economic crises.
+        A discourse telemetry system built on 60,000 Chilean news articles (2012–2024). Ten latent signals, discovered unsupervised — tested against macroeconomic outcomes to ask: does collective media attention predict what the economy does next?
       </p>
       <div class="hero-links">
         <a href="https://docs.google.com/document/d/1xqA7kIex1yJrXBbAT9yd6231NXWr-IRydU7ExGlB6vI/edit" target="_blank" rel="noopener" data-i18n="btn-paper">Read the paper ↗</a>
@@ -1059,17 +1059,17 @@
       <div class="intro-step">
         <div class="step-num" data-i18n="step1-num">01 · Corpus</div>
         <h3 data-i18n="step1-h">12 years of economic journalism</h3>
-        <p data-i18n="step1-p">Articles from La Tercera and Biobío's business sections were scraped from the web via the Wayback Machine archives, spanning four presidential terms.</p>
+        <p data-i18n="step1-p">Articles from La Tercera and Biobío's business sections were scraped from the web via the Wayback Machine archives, spanning four presidential terms, two social upheavals, and one pandemic.</p>
       </div>
       <div class="intro-step">
         <div class="step-num" data-i18n="step2-num">02 · Model</div>
-        <h3 data-i18n="step2-h">10 topics, discovered unsupervised</h3>
-        <p data-i18n="step2-p">A machine learning model (LDA) decomposed 60K documents into 10 recurring themes with no labels imposed. Each article is a mix of all 10 topics.</p>
+        <h3 data-i18n="step2-h">10 latent signals, no labels imposed</h3>
+        <p data-i18n="step2-p">LDA decomposed 60K documents into 10 recurring themes. BETO (a Spanish BERT model) added a sentiment layer. Together: what the discourse is about, and how it sounds.</p>
       </div>
       <div class="intro-step">
         <div class="step-num" data-i18n="step3-num">03 · Explore</div>
-        <h3 data-i18n="step3-h">Watch the discourse shift</h3>
-        <p data-i18n="step3-p">Press play or drag the slider. Each cell represents a topic; its size shows how much of the conversation it occupied that month.</p>
+        <h3 data-i18n="step3-h">Explore 12 years of discourse, month by month</h3>
+        <p data-i18n="step3-p">Press play or drag the slider. Each cell represents a topic; its size shows how much of the conversation it held that month. The treemap is not decorative — it is the signal.</p>
       </div>
     </div>
 
@@ -1169,7 +1169,7 @@
     <div id="macro-section">
       <div class="macro-hdr">
         <h3 data-i18n="macro-h">Discourse Signal vs. Macroeconomic Outcomes</h3>
-        <p class="macro-sub" data-i18n="macro-p">News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal and explores whether shifts in collective media attention move alongside macroeconomic outcomes.</p>
+        <p class="macro-sub" data-i18n="macro-p">News narratives can be quantified and turned into a measurable signal. Here we compare that signal against IMACEC — Chile's monthly economic activity index — to ask: does discourse shift before the economy does?</p>
         <div class="macro-callout">
           <strong data-i18n="macro-callout-title">Benchmarking note:</strong>
           <span data-i18n="macro-callout-body"> We validated the narrative signal against IMACEC Chile's broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.</span>
@@ -1254,9 +1254,7 @@
     <section id="method">
       <h2 data-i18n="method-h">Methodology</h2>
       <p class="sub" data-i18n-html="method-sub">
-        A full reproducible NLP pipeline from raw HTML to interactive visualization 
-        without pre-labeled training data. All code is
-        <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.
+        The pipeline — scraping, NLP decomposition, econometric validation, public dashboard — can be applied to any corpus with a monthly time series. Chile is where it was built and tested. All code is <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.
       </p>
 
       <div class="pipeline-steps">
@@ -2686,6 +2684,7 @@
       renderMacro();
       updateMonthInsight(T.months[0].slice(0, 4));
       initScroll();
+      applyLang(lang); // ensure STRINGS always win over hardcoded HTML fallbacks
       const ov = document.getElementById('loading-overlay');
       ov.classList.add('hidden');
       setTimeout(() => ov.remove(), 500);
