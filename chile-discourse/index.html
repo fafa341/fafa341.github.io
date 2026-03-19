@@ -1199,8 +1199,8 @@
           <div class="mi-prompt">
             <span class="mi-icon">✦</span>
             <div>
-              <div class="mi-q-main">Do you notice anything?</div>
-              <div class="mi-q-sub">Which economic indicator would you compare this signal with? What does the co-movement suggest to you?</div>
+              <div class="mi-q-main">What does the co-movement tell you?</div>
+              <div class="mi-q-sub">Which economic indicator would you compare this signal with? Does the discourse shift before the economy, or after?</div>
             </div>
           </div>
           <span class="mi-caret">Read the interpretation</span>
@@ -2313,8 +2313,8 @@
     en: {
       'nav-title':     'Chilean Discourse · 2012–2024',
       'eyebrow':       'Undergraduate Thesis · 2025',
-      'hero-h1':       'How <em>Chile talked to itself</em><br>over 12 years of news',
-      'hero-subtitle': '60,000+ articles from La Tercera and Biobío (2012–2024), decomposed into 10 consistent narratives. Explore how Chilean public conversation shifted across elections, protests, and economic crises.',
+      'hero-h1':       'The news predicts the economy.<br>But only <em>when everyone is already watching.</em>',
+      'hero-subtitle': 'A discourse telemetry system built on 60,000 Chilean news articles (2012–2024). Ten latent signals, discovered unsupervised — tested against macroeconomic outcomes to ask: does collective media attention predict what the economy does next?',
       'btn-paper':     'Read the paper ↗',
       'btn-code':      'View code ↗',
       'btn-limits':    'Limitations & FAQ ↓',
@@ -2325,13 +2325,13 @@
       'lbl-topics':    'Topics found by LDA',
       'step1-num':     '01 · Corpus',
       'step1-h':       '12 years of economic journalism',
-      'step1-p':       'Articles from La Tercera and Biobío\'s business sections were scraped from the web via the Wayback Machine archives, spanning four presidential terms.',
+      'step1-p':       'Articles from La Tercera and Biobío\'s business sections were scraped from the web via the Wayback Machine archives, spanning four presidential terms, two social upheavals, and one pandemic.',
       'step2-num':     '02 · Model',
-      'step2-h':       '10 topics, discovered unsupervised',
-      'step2-p':       'A machine learning model (LDA) decomposed 60K documents into 10 recurring themes with no labels imposed. Each article is a mix of all 10 topics.',
+      'step2-h':       '10 latent signals, no labels imposed',
+      'step2-p':       'LDA decomposed 60K documents into 10 recurring themes. BETO (a Spanish BERT model) added a sentiment layer. Together: what the discourse is about, and how it sounds.',
       'step3-num':     '03 · Explore',
-      'step3-h':       'Watch the discourse shift',
-      'step3-p':       'Press play or drag the slider. Each cell represents a topic; its size shows how much of the conversation it occupied that month.',
+      'step3-h':       'Explore 12 years of discourse, month by month',
+      'step3-p':       'Press play or drag the slider. Each cell represents a topic; its size shows how much of the conversation it held that month. The treemap is not decorative — it is the signal.',
       'topic-hint':    '← click a topic to explore it',
       'd-empty':       'Click a topic cell to explore it',
       'sec-proportion':'Proportion over time',
@@ -2339,7 +2339,7 @@
       'sec-articles':  'Representative articles',
       'show-more':     'Show more articles',
       'macro-h':            'Discourse Signal vs. Macroeconomic Outcomes',
-      'macro-p':            'News narratives can be quantified. This project distils 60,000 articles into a measurable discourse signal and explores whether shifts in collective media attention move alongside macroeconomic outcomes.',
+      'macro-p':            'News narratives can be quantified and turned into a measurable signal. Here we compare that signal against IMACEC — Chile\'s monthly economic activity index — to ask: does discourse shift before the economy does?',
       'macro-callout-title':'Benchmarking note:',
       'macro-callout-body': ' We validated the narrative signal against IMACEC Chile\'s broad monthly activity index. This confirms the framework works. The real edge lies in narrowing it down: mapping specific latent topics to their sectoral counterparts to reduce noise and sharpen the causal signal.',
       'leg-imacec':         'IMACEC (economic activity)',
@@ -2350,14 +2350,14 @@
       'ws-h':          'Explore the Vocabulary',
       'ws-sub':        'Search any of the 10,000 words in the corpus. The chart shows raw mention counts per year across 60,348 articles how often each word actually appeared in Chilean economic media.',
       'method-h':      'Methodology',
-      'method-sub':    'A full reproducible NLP pipeline from raw HTML to interactive visualization without pre-labeled training data. All code is <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.',
+      'method-sub':    'The pipeline — scraping, NLP decomposition, econometric validation, public dashboard — can be applied to any corpus with a monthly time series. Chile is where it was built and tested. All code is <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">open source</a>.',
       'footer':        'Fabio Fuentes · 2025',
     },
     es: {
       'nav-title':     'Discurso Chileno · 2012–2024',
       'eyebrow':       'Tesis de Pregrado · 2025',
-      'hero-h1':       'Cómo <em>Chile conversó consigo mismo</em><br>en 12 años de noticias',
-      'hero-subtitle': 'Más de 60,000 artículos de La Tercera y Biobío (2012–2024), descompuestos en 10 narrativas consistentes. Explora cómo la conversación pública chilena cambió entre elecciones, protestas y crisis económicas.',
+      'hero-h1':       'Las noticias predicen la economía.<br>Pero solo <em>cuando todos ya están prestando atención.</em>',
+      'hero-subtitle': 'Un sistema de telemetría discursiva construido sobre 60.000 artículos chilenos (2012–2024). Diez señales latentes, descubiertas sin supervisión — comparadas contra resultados macroeconómicos para preguntar: ¿la atención colectiva predice lo que hará la economía?',
       'btn-paper':     'Leer el artículo ↗',
       'btn-code':      'Ver código ↗',
       'btn-limits':    'Limitaciones & FAQ ↓',
@@ -2368,13 +2368,13 @@
       'lbl-topics':    'Temas (LDA)',
       'step1-num':     '01 · Corpus',
       'step1-h':       '12 años de periodismo económico',
-      'step1-p':       'Artículos de las secciones de negocios de La Tercera y Biobío fueron extraídos de la web mediante los archivos de Wayback Machine, abarcando cuatro períodos presidenciales.',
+      'step1-p':       'Artículos de las secciones de negocios de La Tercera y Biobío fueron extraídos de la web mediante los archivos de Wayback Machine, abarcando cuatro períodos presidenciales, dos estallidos sociales y una pandemia.',
       'step2-num':     '02 · Modelo',
-      'step2-h':       '10 temas, descubiertos sin supervisión',
-      'step2-p':       'Un modelo de aprendizaje automático (LDA) descompuso 60K documentos en 10 temas recurrentes sin etiquetas impuestas. Cada artículo es una mezcla de los 10 temas.',
+      'step2-h':       '10 señales latentes, sin etiquetas impuestas',
+      'step2-p':       'LDA descompuso 60K documentos en 10 temas recurrentes. BETO (un modelo BERT en español) añadió una capa de sentimiento. Juntos: de qué trata el discurso y cómo suena.',
       'step3-num':     '03 · Explora',
-      'step3-h':       'Observa el cambio en el discurso',
-      'step3-p':       'Presiona play o arrastra el slider. Cada celda es un tema; su tamaño indica qué proporción de la conversación ocupó ese mes.',
+      'step3-h':       'Explora 12 años de discurso, mes a mes',
+      'step3-p':       'Presiona play o arrastra el slider. Cada celda es un tema; su tamaño muestra qué proporción de la conversación ocupó ese mes. El mapa no es decorativo: es la señal.',
       'topic-hint':    '← clic en un tema para explorarlo',
       'd-empty':       'Haz clic en un tema para explorarlo',
       'sec-proportion':'Proporción en el tiempo',
@@ -2385,7 +2385,7 @@
       'leg-unemp':     'Desempleo (%)',
       'leg-topic':          'Proporción del tema seleccionado',
       'macro-h':            'Señal Discursiva vs. Resultados Macroeconómicos',
-      'macro-p':            'Las narrativas mediáticas pueden cuantificarse. Este proyecto destila 60.000 artículos en una señal discursiva medible y explora si los cambios en la atención colectiva de los medios se mueven junto a los resultados macroeconómicos.',
+      'macro-p':            'Las narrativas mediáticas pueden cuantificarse. Aquí comparamos esa señal contra el IMACEC — el índice mensual de actividad económica de Chile — para preguntar: ¿el discurso se mueve antes que la economía?',
       'macro-callout-title':'Nota metodológica:',
       'macro-callout-body': ' Validamos la señal narrativa contra el IMACEC el índice mensual de actividad de Chile. Esto confirma que el marco funciona. La ventaja real está en mapear temas latentes específicos a sus contrapartes sectoriales, reduciendo el ruido y precisando la señal causal.',
       'yr-insight-label':   '✦ Interpretación IA',
@@ -2393,7 +2393,7 @@
       'ws-h':          'Explorar el Vocabulario',
       'ws-sub':        'Busca cualquiera de las 10,000 palabras del corpus. El gráfico muestra conteos reales de menciones por año en 60,348 artículos cuántas veces apareció cada palabra en los medios económicos chilenos.',
       'method-h':      'Metodología',
-      'method-sub':    'Un pipeline NLP reproducible desde HTML crudo hasta visualización interactiva sin datos de entrenamiento etiquetados. Todo el código está <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">disponible</a>.',
+      'method-sub':    'El pipeline — extracción, descomposición NLP, validación econométrica, dashboard público — puede aplicarse a cualquier corpus con una serie de tiempo mensual. Chile es donde se construyó y probó. Todo el código está <a href="https://github.com/fafa341/final_pipeline" target="_blank" rel="noopener">disponible</a>.',
       'footer':        'Fabio Fuentes · 2025',
     }
   };
