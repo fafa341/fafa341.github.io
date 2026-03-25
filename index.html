@@ -36,6 +36,35 @@
       padding: 72px 48px 96px;
     }
 
+    /* ── LANG TOGGLE ── */
+    .lang-toggle {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--divider);
+      overflow: hidden;
+      width: fit-content;
+      margin-left: auto;
+      margin-bottom: 32px;
+    }
+
+    .lang-toggle button {
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font);
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background 0.15s, color 0.15s;
+      background: var(--tag-bg);
+      color: var(--text-muted);
+    }
+
+    .lang-toggle button.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
     /* ── HEADER ── */
     .header { margin-bottom: 72px; }
 
@@ -62,6 +91,8 @@
       line-height: 1.6;
       margin-bottom: 6px;
     }
+
+    .header-bio a { color: inherit; }
 
     .header-links {
       display: flex;
@@ -230,12 +261,9 @@
 
     .link-plain:hover { text-decoration: underline; }
 
-    .link-sep {
-      color: var(--divider);
-      user-select: none;
-    }
+    .link-sep { color: var(--divider); user-select: none; }
 
-    /* ── ABOUT ── */
+    /* ── RESEARCH ── */
     .about-text p {
       font-size: 16px;
       color: var(--body);
@@ -248,12 +276,7 @@
     .about-text a:hover { text-decoration: underline; }
 
     /* ── FOOTER ── */
-    .footer {
-      text-align: right;
-      font-size: 12px;
-      color: var(--footer);
-    }
-
+    .footer { text-align: right; font-size: 12px; color: var(--footer); }
     .footer a { color: var(--footer); }
 
     /* ── MOBILE ── */
@@ -268,20 +291,26 @@
 <body>
   <div class="page">
 
+    <!-- LANG TOGGLE -->
+    <div class="lang-toggle">
+      <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
+      <button id="btn-es" onclick="setLang('es')">ES</button>
+    </div>
+
     <!-- HEADER -->
     <header class="header">
       <h1 class="header-name">Fabio Fuentes</h1>
       <div class="header-inner">
         <div class="header-text">
-          <p class="header-bio"><strong>I'm Fabio, an engineer and researcher.</strong></p>
-          <p class="header-bio">
+          <p class="header-bio"><strong data-i18n="bio-intro">I'm Fabio, an engineer and researcher.</strong></p>
+          <p class="header-bio" data-i18n-html="bio-p1">
             I've built data-driven systems for large-scale text analysis, topic modeling, and applied econometrics. For my undergraduate thesis (advised by <a href="https://sites.google.com/view/benjaminvillena" style="color:inherit;">Benjamín Villena-Roldán</a>), I analyzed ~60,000 Chilean news articles to estimate the dynamic effects of shocks to media narratives on subsequent economic activity.
           </p>
-          <p class="header-bio">
+          <p class="header-bio" data-i18n="bio-p2">
             More recently, I built a quoting system in manufacturing that encodes pricing logic into a rule-based system, logs every decision, and tracks overrides to reduce variability in pricing decisions and improve margin control.
           </p>
           <nav class="header-links">
-            <a href="mailto:fabio.fuentes@outlook.com">Email</a>
+            <a href="mailto:fabio.fuentes@outlook.com" data-i18n="link-email">Email</a>
             <span class="sep">·</span>
             <a href="https://x.com/FabioFuentes5">X</a>
             <span class="sep">·</span>
@@ -298,7 +327,7 @@
 
     <!-- PROJECTS -->
     <section class="section">
-      <div class="section-label">Projects</div>
+      <div class="section-label" data-i18n="sec-projects">Projects</div>
       <hr class="section-rule">
 
       <div class="project-grid">
@@ -309,7 +338,7 @@
           </div>
           <div class="project-body">
             <div class="project-title-row">
-              <a class="project-title" href="https://fafa341.github.io/chile-discourse/">What Chile talks about might tell us where the economy is going.</a>
+              <a class="project-title" href="https://fafa341.github.io/chile-discourse/" data-i18n="p1-title">What Chile talks about might tell us where the economy is going.</a>
               <span class="project-year">2025</span>
             </div>
             <div class="project-tags">
@@ -317,14 +346,14 @@
               <span class="tag">NLP</span>
               <span class="tag">Econometrics</span>
             </div>
-            <p class="project-desc">
+            <p class="project-desc" data-i18n="p1-desc">
               When media attention shifts toward a topic, discourse and economic activity co-move, but the signal amplifies only when collective attention on that topic is already elevated. Built on 60,000 Chilean news articles (2012-2024) using LDA, Spanish BERT, and state-dependent local projections.
             </p>
             <div class="project-links">
-              <a class="link-demo" href="https://fafa341.github.io/chile-discourse/">View &rarr; Interactive Demo</a>
-              <a class="link-plain" href="https://docs.google.com/document/d/1xqA7kIex1yJrXBbAT9yd6231NXWr-IRydU7ExGlB6vI/edit">paper</a>
+              <a class="link-demo" href="https://fafa341.github.io/chile-discourse/" data-i18n="p1-demo">View &rarr; Interactive Demo</a>
+              <a class="link-plain" href="https://docs.google.com/document/d/1xqA7kIex1yJrXBbAT9yd6231NXWr-IRydU7ExGlB6vI/edit" data-i18n="link-paper">paper</a>
               <span class="link-sep">·</span>
-              <a class="link-plain" href="signal_noise_learnings.html">learnings</a>
+              <a class="link-plain" href="signal_noise_learnings.html" data-i18n="link-learnings">learnings</a>
             </div>
           </div>
         </article>
@@ -335,20 +364,20 @@
           </div>
           <div class="project-body">
             <div class="project-title-row">
-              <a class="project-title" href="https://docs.google.com/document/d/1WYdJrVxKxN80NJS01hLmDlZbPldYaWsG/edit">CFA LATAM Report</a>
+              <a class="project-title" href="https://docs.google.com/document/d/1WYdJrVxKxN80NJS01hLmDlZbPldYaWsG/edit" data-i18n="p2-title">CFA LATAM Report</a>
               <span class="project-year">2025</span>
             </div>
             <div class="project-tags">
-              <span class="tag">Report</span>
+              <span class="tag" data-i18n="tag-report">Report</span>
               <span class="tag">Finance</span>
             </div>
-            <p class="project-desc">
+            <p class="project-desc" data-i18n="p2-desc">
               Comprehensive analysis of Latin American capital markets and financial trends, produced for the CFA Institute.
             </p>
             <div class="project-links">
-              <a class="link-plain" href="https://docs.google.com/document/d/1WYdJrVxKxN80NJS01hLmDlZbPldYaWsG/edit">report</a>
+              <a class="link-plain" href="https://docs.google.com/document/d/1WYdJrVxKxN80NJS01hLmDlZbPldYaWsG/edit" data-i18n="link-report">report</a>
               <span class="link-sep">·</span>
-              <a class="link-plain" href="cfa_latam_learnings.html">learnings</a>
+              <a class="link-plain" href="cfa_latam_learnings.html" data-i18n="link-learnings">learnings</a>
             </div>
           </div>
         </article>
@@ -356,15 +385,15 @@
       </div>
     </section>
 
-    <!-- ABOUT -->
+    <!-- RESEARCH -->
     <section class="section">
-      <div class="section-label">Research</div>
+      <div class="section-label" data-i18n="sec-research">Research</div>
       <hr class="section-rule">
       <div class="about-text">
-        <p>
+        <p data-i18n="research-p1">
           My goal is to advance scientific knowledge and collective well-being by building systems that are usable, safe, and legible, and evaluating them by their effects on decisions and outcomes.
         </p>
-        <p>
+        <p data-i18n="research-p2">
           I'm currently interested in turning language into measurable signals of behavior and real-world impact.
         </p>
       </div>
@@ -372,9 +401,78 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-      Based on <a href="https://jonbarron.info/">Jon Barron's website</a>.
+      <span data-i18n="footer-base">Based on</span> <a href="https://jonbarron.info/">Jon Barron's website</a>.
     </footer>
 
   </div>
+
+  <script>
+    const STRINGS = {
+      en: {
+        'bio-intro':    "I'm Fabio, an engineer and researcher.",
+        'bio-p1':       "I've built data-driven systems for large-scale text analysis, topic modeling, and applied econometrics. For my undergraduate thesis (advised by <a href=\"https://sites.google.com/view/benjaminvillena\" style=\"color:inherit;\">Benjamín Villena-Roldán</a>), I analyzed ~60,000 Chilean news articles to estimate the dynamic effects of shocks to media narratives on subsequent economic activity.",
+        'bio-p2':       "More recently, I built a quoting system in manufacturing that encodes pricing logic into a rule-based system, logs every decision, and tracks overrides to reduce variability in pricing decisions and improve margin control.",
+        'link-email':   "Email",
+        'sec-projects': "Projects",
+        'p1-title':     "What Chile talks about might tell us where the economy is going.",
+        'p1-desc':      "When media attention shifts toward a topic, discourse and economic activity co-move, but the signal amplifies only when collective attention on that topic is already elevated. Built on 60,000 Chilean news articles (2012-2024) using LDA, Spanish BERT, and state-dependent local projections.",
+        'p1-demo':      "View \u2192 Interactive Demo",
+        'link-paper':   "paper",
+        'link-learnings':"learnings",
+        'p2-title':     "CFA LATAM Report",
+        'p2-desc':      "Comprehensive analysis of Latin American capital markets and financial trends, produced for the CFA Institute.",
+        'tag-report':   "Report",
+        'link-report':  "report",
+        'sec-research': "Research",
+        'research-p1':  "My goal is to advance scientific knowledge and collective well-being by building systems that are usable, safe, and legible, and evaluating them by their effects on decisions and outcomes.",
+        'research-p2':  "I'm currently interested in turning language into measurable signals of behavior and real-world impact.",
+        'footer-base':  "Based on",
+      },
+      es: {
+        'bio-intro':    "Soy Fabio, ingeniero e investigador.",
+        'bio-p1':       "He construido sistemas basados en datos para análisis de texto a gran escala, modelado de tópicos y econometría aplicada. En mi tesis de pregrado (asesorada por <a href=\"https://sites.google.com/view/benjaminvillena\" style=\"color:inherit;\">Benjamín Villena-Roldán</a>), analicé ~60.000 artículos de prensa chilena para estimar los efectos dinámicos de los shocks en las narrativas mediáticas sobre la actividad económica.",
+        'bio-p2':       "Más recientemente, construí un sistema de cotización en manufactura que codifica la lógica de precios en un sistema basado en reglas, registra cada decisión y rastrea las modificaciones para reducir la variabilidad en las decisiones de precios y mejorar el control de márgenes.",
+        'link-email':   "Correo",
+        'sec-projects': "Proyectos",
+        'p1-title':     "Lo que Chile habla podría decirnos hacia dónde va la economía.",
+        'p1-desc':      "Cuando la atención mediática se desplaza hacia un tema, el discurso y la actividad económica se mueven juntos, pero la señal solo se amplifica cuando la atención colectiva sobre ese tema ya es elevada. Basado en 60.000 artículos de prensa chilena (2012-2024) usando LDA, BERT en español y proyecciones locales dependientes del estado.",
+        'p1-demo':      "Ver \u2192 Demo Interactivo",
+        'link-paper':   "artículo",
+        'link-learnings':"aprendizajes",
+        'p2-title':     "Informe CFA LATAM",
+        'p2-desc':      "Análisis exhaustivo de los mercados de capitales latinoamericanos y tendencias financieras, elaborado para el CFA Institute.",
+        'tag-report':   "Informe",
+        'link-report':  "informe",
+        'sec-research': "Investigación",
+        'research-p1':  "Mi objetivo es avanzar el conocimiento científico y el bienestar colectivo construyendo sistemas que sean usables, seguros y legibles, y evaluarlos por sus efectos en decisiones y resultados.",
+        'research-p2':  "Actualmente me interesa convertir el lenguaje en señales medibles de comportamiento e impacto en el mundo real.",
+        'footer-base':  "Basado en el sitio web de",
+      }
+    };
+
+    let lang = localStorage.getItem('lang') || 'en';
+
+    function applyLang(l) {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (STRINGS[l][key] !== undefined) el.textContent = STRINGS[l][key];
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (STRINGS[l][key] !== undefined) el.innerHTML = STRINGS[l][key];
+      });
+      document.getElementById('btn-en').classList.toggle('active', l === 'en');
+      document.getElementById('btn-es').classList.toggle('active', l === 'es');
+      document.documentElement.lang = l;
+    }
+
+    function setLang(l) {
+      lang = l;
+      localStorage.setItem('lang', l);
+      applyLang(l);
+    }
+
+    applyLang(lang);
+  </script>
 </body>
 </html>
