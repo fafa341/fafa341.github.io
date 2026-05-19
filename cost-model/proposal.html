@@ -1,389 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manufacturing Cost Model</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manufacturing Cost Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg:         #FFFFFF;
+  --table:      #D8D6D1;
+  --mat-bg:     #EBF1FA;
+  --mat-border: #B0C4DC;
+  --surface:    #F4F7FB;
+  --border:     #C8D6E4;
+  --border-dim: #DDE8F0;
+  --border-ink: #1B3A6B;
+  --text:       #0C1319;
+  --muted:      #4A5B6B;
+  --dim:        #8A9BAA;
+  --blue:       #1255C8;
+  --blue-mid:   #1B6FE8;
+  --blue-light: #E8F0FD;
+  --red:        #C42B2B;
+  --red-light:  #FDF0F0;
+  --engine:     #0D1B3E;
+  --font:  'IBM Plex Sans', system-ui, sans-serif;
+  --mono:  'IBM Plex Mono', monospace;
+  --serif: 'IBM Plex Serif', Georgia, serif;
+}
 
-  <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; font-size: 16px; line-height: 1.7; }
 
-  :root {
-    --bg:       #F4EFE8;
-    --surface:  #FBF8F4;
-    --surface2: #EDE8DF;
-    --border:   #DDD8D0;
-    --text:     #1C1917;
-    --muted:    #78766E;
-    --heading:  #1C1917;
-    --accent:   #354F6E;
-    --steel:    #4F7EA8;
-    --amber:    #C2622A;
-    --green:    #2D6A4F;
-    --engine:   #1E2B3C;
-    --gold:     #D4A843;
-    --font:     'Inter', system-ui, sans-serif;
-    --mono:     'JetBrains Mono', monospace;
-  }
+/* ── PROGRESS ── */
+#progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--blue); z-index: 300; width: 0; transition: width 0.1s; }
 
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 15px;
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-  }
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(12,19,25,0.96);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 0;
+}
+.nav-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0 40px;
+  height: 48px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-back {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+  color: var(--blue-mid); text-decoration: none;
+  transition: color 0.15s;
+}
+.nav-back:hover { color: #7BB8FF; }
+.nav-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: rgba(255,255,255,0.5); }
+.nav-anchors { display: flex; gap: 24px; }
+.nav-anchor {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.15s;
+}
+.nav-anchor:hover { color: rgba(255,255,255,0.7); }
 
-  /* ── Dot grid ── */
-  .dot-grid {
-    background-color: var(--bg);
-    background-image: radial-gradient(circle, rgba(83,98,112,0.18) 1px, transparent 1px);
-    background-size: 20px 20px;
-  }
+/* ── LAYOUT ── */
+.wrap      { max-width: 860px;  margin: 0 auto; padding: 0 40px; }
+.wrap-wide { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
 
-  /* ── Progress bar ── */
-  #progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); z-index: 200; transition: width 0.1s; }
+/* ── TABLE SURFACE + MAT ── */
+.table-surface { background: var(--table); padding: 56px 40px; }
+.blueprint-mat {
+  background-color: var(--mat-bg);
+  background-image:
+    linear-gradient(rgba(18,85,200,0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18,85,200,0.09) 1px, transparent 1px),
+    linear-gradient(rgba(18,85,200,0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18,85,200,0.22) 1px, transparent 1px);
+  background-size: 8px 8px, 8px 8px, 40px 40px, 40px 40px;
+  border: 1px solid var(--mat-border);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10);
+  max-width: 1020px; margin: 0 auto;
+}
+.mat-pad { padding: 40px 48px; }
+.mat-header {
+  padding: 32px 48px 24px;
+  border-bottom: 1px solid rgba(18,85,200,0.18);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+}
+.mat-section-num {
+  font-family: var(--mono); font-size: 72px; font-weight: 700;
+  color: rgba(18,85,200,0.14); line-height: 1; flex-shrink: 0; user-select: none;
+}
+.mat-section-title {
+  font-family: var(--font); font-size: 26px; font-weight: 600;
+  color: var(--text); line-height: 1.2; letter-spacing: -0.015em;
+}
+.mat-section-title em { color: var(--blue); font-style: italic; }
+.mat-sub { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px; letter-spacing: 0.04em; }
 
-  /* ── Nav ── */
-  nav {
-    border-bottom: 1px solid var(--border);
-    padding: 14px 0;
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(244,239,232,0.92);
-    backdrop-filter: blur(8px);
-  }
-  .nav-inner { max-width: 940px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 14px; }
-  .nav-back { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
-  .nav-back:hover { color: var(--text); }
-  .nav-sep { color: var(--border); }
-  .nav-title { font-size: 13px; color: var(--muted); }
+/* ── SYS LABEL ── */
+.sys-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue);
+}
 
-  /* ── Shared layout ── */
-  .wrap  { max-width: 940px; margin: 0 auto; padding: 0 24px; }
-  .wrap-wide { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+/* ── SECTION RULE ── */
+.section-rule {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 48px;
+}
+.section-rule::before, .section-rule::after {
+  content: ''; display: block; height: 1px; background: var(--border);
+}
+.section-rule::before { width: 40px; flex-shrink: 0; }
+.section-rule::after  { flex: 1; }
+.rule-label {
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  letter-spacing: 0.08em; white-space: nowrap;
+}
 
-  /* ── Hero ── */
-  .hero { padding: 72px 0 60px; }
-  .eyebrow {
-    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.13em;
-    color: var(--steel); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-  }
-  .eyebrow-line { width: 24px; height: 1px; background: var(--steel); flex-shrink: 0; }
-  .hero h1 {
-    font-size: clamp(30px, 5vw, 54px); font-weight: 800; line-height: 1.08;
-    letter-spacing: -0.03em; color: var(--heading); margin-bottom: 20px;
-  }
-  .hero h1 em { color: var(--accent); font-style: normal; }
-  .hero-sub { font-size: 17px; color: var(--muted); max-width: 580px; line-height: 1.75; margin-bottom: 36px; }
-  .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; padding-top: 28px; border-top: 1px solid var(--border); }
-  .stat-val { font-size: 32px; font-weight: 800; color: var(--accent); letter-spacing: -0.04em; line-height: 1; }
-  .stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 5px; }
+/* ── HERO ── */
+.hero { padding: 80px 0 64px; }
+.hero-eyebrow {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue);
+  margin-bottom: 28px; display: flex; align-items: center; gap: 12px;
+}
+.hero-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--blue); }
+.hero h1 {
+  font-family: var(--font); font-size: clamp(32px, 5vw, 58px);
+  font-weight: 700; line-height: 1.06; letter-spacing: -0.025em;
+  color: var(--text); margin-bottom: 24px;
+}
+.hero h1 em { color: var(--blue); font-style: normal; }
+.hero-sub { font-size: 17px; color: var(--muted); max-width: 560px; line-height: 1.7; margin-bottom: 48px; }
+.hero-equation {
+  font-family: var(--mono); font-size: 14px; color: var(--blue);
+  padding: 18px 24px; border: 1px solid var(--border); background: var(--blue-light);
+  display: inline-block; margin-bottom: 48px; line-height: 1.8;
+}
+.hero-equation .eq-sub { font-size: 11px; color: var(--muted); }
+.hero-stats {
+  display: flex; gap: 48px; flex-wrap: wrap;
+  border-top: 1px solid var(--border-dim); padding-top: 32px;
+}
+.stat-num { font-family: var(--mono); font-size: 28px; font-weight: 600; color: var(--text); display: block; }
+.stat-lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-top: 4px; }
 
-  /* ── Story sections ── */
-  .story { padding: 72px 0; border-top: 1px solid var(--border); }
-  .section-num { font-size: 64px; font-weight: 800; color: var(--border); letter-spacing: -0.04em; line-height: 0.9; margin-bottom: 14px; }
-  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 8px; }
-  .section-title { font-size: clamp(22px, 3vw, 34px); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; color: var(--heading); margin-bottom: 8px; }
-  .section-deck { font-size: 16px; color: var(--muted); max-width: 540px; line-height: 1.7; margin-bottom: 36px; }
-  .prose p { font-size: 16px; line-height: 1.8; color: var(--text); margin-bottom: 20px; max-width: 680px; }
-  .prose p:last-child { margin-bottom: 0; }
-  .callout {
-    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
-    border-radius: 8px; padding: 20px 24px; margin: 28px 0;
-    font-size: 15px; line-height: 1.75; color: var(--text); font-style: italic;
-    max-width: 680px;
-  }
-  .callout strong { font-style: normal; font-weight: 700; color: var(--accent); }
-  .dark-box {
-    background: var(--accent); color: white; border-radius: 12px; padding: 32px 36px; margin: 40px 0;
-  }
-  .dark-box .db-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.6; margin-bottom: 12px; font-family: var(--mono); }
-  .dark-box p { font-size: 17px; line-height: 1.7; opacity: 0.95; }
+/* ── STORY SECTIONS (white) ── */
+.story { padding: 72px 0; border-top: 1px solid var(--border-dim); }
+.story-num { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
+.story h2 {
+  font-family: var(--font); font-size: clamp(22px, 3vw, 34px);
+  font-weight: 700; line-height: 1.2; letter-spacing: -0.02em;
+  color: var(--text); margin-bottom: 8px;
+}
+.story .deck { font-size: 17px; color: var(--muted); max-width: 560px; line-height: 1.7; margin-bottom: 36px; }
+.prose p { font-size: 16px; line-height: 1.8; color: var(--text); margin-bottom: 20px; max-width: 700px; }
+.prose p:last-child { margin-bottom: 0; }
+.pullquote {
+  font-family: var(--serif); font-size: 20px; font-style: italic;
+  color: var(--text); line-height: 1.65; max-width: 640px;
+  padding: 0 0 0 24px; border-left: 2px solid var(--blue);
+  margin: 36px 0;
+}
+.insight-box {
+  background: var(--engine); color: white; padding: 32px 36px; margin: 36px 0; max-width: 700px;
+}
+.insight-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(27,111,232,0.7); margin-bottom: 12px; }
+.insight-box p { font-size: 16px; line-height: 1.75; color: rgba(255,255,255,0.88); }
+.callout-block {
+  background: var(--surface); border: 1px solid var(--border-dim); border-left: 2px solid var(--blue);
+  padding: 20px 24px; margin: 28px 0; max-width: 700px;
+  font-size: 16px; line-height: 1.75; color: var(--text);
+}
 
-  /* ── OLD MODEL flow (section 1) ── */
-  .old-model { display: grid; grid-template-columns: 1fr 60px 1fr; align-items: center; margin: 36px 0; gap: 0; }
-  .flow-col { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
-  .flow-col-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 12px; font-family: var(--mono); }
-  .flow-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
-  .flow-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .flow-item:first-child { padding-top: 0; }
-  .flow-num { font-size: 11px; font-weight: 700; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; min-width: 28px; text-align: center; flex-shrink: 0; margin-top: 2px; font-family: var(--mono); }
-  .flow-num.warn { background: #FEF3C7; border-color: #FDE68A; color: #92400E; }
-  .flow-num.bad  { background: #FEE2E2; border-color: #FECACA; color: #991B1B; }
-  .flow-text-title { font-size: 13px; font-weight: 600; line-height: 1.3; }
-  .flow-text-sub   { font-size: 12px; color: var(--muted); margin-top: 1px; }
-  .arrow-mid { display: flex; align-items: center; justify-content: center; }
+/* ── OLD MODEL FLOW ── */
+.old-model { display: grid; grid-template-columns: 1fr 48px 1fr; align-items: center; margin: 36px 0; max-width: 700px; }
+.flow-col { background: var(--surface); border: 1px solid var(--border); padding: 20px; }
+.flow-col-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-bottom: 12px; }
+.flow-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border-dim); }
+.flow-item:last-child { border-bottom: none; padding-bottom: 0; }
+.flow-item:first-child { padding-top: 0; }
+.flow-num { font-family: var(--mono); font-size: 11px; font-weight: 600; background: var(--border-dim); padding: 2px 7px; min-width: 28px; text-align: center; flex-shrink: 0; margin-top: 2px; }
+.flow-num.warn { background: #FEF3C7; color: #92400E; }
+.flow-num.bad  { background: var(--red-light); color: var(--red); }
+.flow-text-title { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.flow-text-sub   { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 3px; }
+.flow-arrow { display: flex; align-items: center; justify-content: center; }
 
-  /* ── ARCHITECTURE DIAGRAM ── */
-  .arch-section { padding: 80px 0; border-top: 1px solid var(--border); }
-  .arch-inner { display: flex; flex-direction: column; align-items: center; }
-  .arch-header { text-align: center; margin-bottom: 48px; }
-  .arch-header .eyebrow { justify-content: center; }
-  .arch-subtitle { font-size: 13px; font-family: var(--mono); color: var(--muted); margin-top: 6px; letter-spacing: 0.03em; }
+/* ── 5-TIER BADGES ── */
+.tier {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  padding: 2px 7px; border: 1.5px solid; display: inline-block;
+  letter-spacing: 0.05em; border-radius: 0;
+}
+.tier-c1 { color: var(--dim);      border-color: var(--border); background: transparent; }
+.tier-c2 { color: var(--blue);     border-color: var(--blue); background: transparent; }
+.tier-c3 { color: var(--blue-mid); border-color: var(--blue-mid); background: var(--blue-light); }
+.tier-c4 { color: #fff;            border-color: var(--blue); background: var(--blue); }
+.tier-c5 { color: #fff;            border-color: var(--red); background: var(--red); }
 
-  .arch-diagram {
-    display: grid;
-    grid-template-columns: 220px 52px 340px 52px 220px;
-    align-items: center;
-    width: 100%; max-width: 920px;
-    gap: 0;
-  }
+/* ── ARCH DIAGRAM ── */
+.arch-schematic {
+  display: grid;
+  grid-template-columns: 200px 56px 280px 56px 200px;
+  align-items: center; gap: 0; padding: 40px 48px;
+  justify-content: center;
+}
+.arch-node-list { display: flex; flex-direction: column; gap: 8px; }
+.arch-node { background: rgba(255,255,255,0.82); border: 1px solid var(--mat-border); padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.arch-node-icon { width: 24px; height: 24px; flex-shrink: 0; }
+.arch-node-text { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text); }
+.arch-node-sub  { font-family: var(--mono); font-size: 9px; color: var(--dim); letter-spacing: 0.06em; }
+.arch-arrow-col { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.arch-arrow-label { font-family: var(--mono); font-size: 9px; color: var(--blue-mid); letter-spacing: 0.06em; }
+.arch-engine {
+  background: var(--engine);
+  border: 1px solid rgba(27,111,232,0.5);
+  padding: 24px;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 8px 8px, 8px 8px;
+  background-color: var(--engine);
+}
+.engine-badge { font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(27,111,232,0.6); margin-bottom: 12px; }
+.engine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(27,111,232,0.25); margin-bottom: 12px; }
+.engine-half { background: var(--engine); padding: 10px 12px; font-family: var(--mono); font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.7); line-height: 1.4; }
+.engine-half.em { color: #7BB8FF; font-style: italic; }
+.engine-footer { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.25); text-align: center; border-top: 1px solid rgba(27,111,232,0.18); padding-top: 10px; letter-spacing: 0.06em; }
+.arch-outputs { display: flex; flex-direction: column; gap: 8px; }
+.arch-output { background: rgba(255,255,255,0.82); border: 1px solid var(--mat-border); border-left: 3px solid var(--blue-mid); padding: 10px 14px; }
+.arch-output-title { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text); }
+.arch-output-sub   { font-family: var(--mono); font-size: 9px; color: var(--dim); margin-top: 2px; }
 
-  /* Left inputs column */
-  .arch-inputs, .arch-outputs {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
-  }
-  .arch-col-hdr {
-    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
-    color: var(--muted); padding: 8px 14px; background: var(--surface2);
-    border-bottom: 1px solid var(--border); font-family: var(--mono);
-  }
-  .arch-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 14px; border-bottom: 1px solid var(--border);
-  }
-  .arch-row:last-child { border-bottom: none; }
-  .arch-icon { width: 32px; height: 32px; flex-shrink: 0; }
-  .arch-row-name { font-size: 12px; font-weight: 600; line-height: 1.2; }
-  .arch-row-sub  { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-top: 1px; }
+/* ── DRIVER CARDS ── */
+.driver-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(176,196,220,0.4); }
+.driver-card { background: rgba(255,255,255,0.7); padding: 24px; position: relative; }
+.driver-ghost {
+  font-family: var(--mono); font-size: 64px; font-weight: 700;
+  color: rgba(18,85,200,0.10); position: absolute; top: 8px; right: 16px; line-height: 1; user-select: none;
+}
+.driver-ghost.red { color: rgba(196,43,43,0.10); }
+.driver-name { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); margin-bottom: 6px; }
+.driver-name.red { color: var(--red); }
+.driver-def  { font-family: var(--mono); font-size: 11px; color: var(--blue); margin-bottom: 8px; }
+.driver-def.red { color: var(--red); }
+.driver-body { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
-  /* Arrow columns */
-  .arch-arrow { display: flex; align-items: center; justify-content: center; }
+/* ── DECOMPOSITION VIEWS ── */
+.decomp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid rgba(176,196,220,0.5); background: rgba(255,255,255,0.85); }
+.decomp-view { padding: 24px; border-right: 1px solid rgba(176,196,220,0.4); border-bottom: 1px solid rgba(176,196,220,0.4); }
+.decomp-view:nth-child(even) { border-right: none; }
+.decomp-view:nth-child(n+3)  { border-bottom: none; }
+.decomp-view-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-bottom: 14px; }
 
-  /* The engine box */
-  .engine-box {
-    background: var(--engine); border-radius: 14px; overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-  .engine-header { padding: 14px 18px 6px; }
-  .engine-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.35); font-family: var(--mono); margin-bottom: 4px; }
-  .engine-name   { font-size: 16px; font-weight: 700; color: white; letter-spacing: -0.01em; }
-  .engine-split {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 1px; background: rgba(255,255,255,0.07);
-    margin: 8px 12px 0; border-radius: 7px; overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.06);
-  }
-  .engine-half { padding: 12px 14px; background: rgba(255,255,255,0.04); }
-  .engine-half.gold-half { background: rgba(212,168,67,0.1); }
-  .engine-half-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); font-family: var(--mono); margin-bottom: 4px; }
-  .engine-half.gold-half .engine-half-lbl { color: rgba(212,168,67,0.65); }
-  .engine-half-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); line-height: 1.3; }
-  .engine-half.gold-half .engine-half-name { color: var(--gold); }
-  .engine-loops {
-    display: flex; justify-content: flex-end; padding: 6px 14px 2px; gap: 3px;
-  }
-  .engine-loop { width: 13px; height: 10px; border: 1.5px solid var(--gold); border-bottom: none; border-radius: 5px 5px 0 0; opacity: 0.5; }
-  .engine-footer { padding: 8px 16px 14px; font-size: 10px; color: rgba(255,255,255,0.25); font-family: var(--mono); text-align: center; letter-spacing: 0.02em; }
+.driver-score-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; border: 1px solid rgba(176,196,220,0.5); border-top: none; background: rgba(255,255,255,0.85); }
+.driver-score-cell { padding: 16px 20px; border-right: 1px solid rgba(176,196,220,0.4); }
+.driver-score-cell:last-child { border-right: none; }
+.dsc-key   { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--blue); margin-bottom: 2px; }
+.dsc-key.red { color: var(--red); }
+.dsc-name  { font-family: var(--mono); font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; }
+.dsc-val   { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+.dsc-val.high { color: var(--red); }
+.pip-row   { display: flex; gap: 3px; margin-top: 8px; }
+.pip       { width: 8px; height: 8px; background: var(--border-dim); }
+.pip.on    { background: var(--blue); }
+.pip.on.red { background: var(--red); }
+.dsc-why   { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.tier-result-row {
+  border: 1px solid rgba(176,196,220,0.5); border-top: none;
+  background: rgba(255,255,255,0.7); padding: 14px 20px;
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+}
 
-  /* Right outputs */
-  .arch-out-row {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 10px 14px; border-bottom: 1px solid var(--border);
-  }
-  .arch-out-row:last-child { border-bottom: none; }
-  .out-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-  .out-dot.steel { background: var(--steel); }
-  .out-dot.amber { background: var(--amber); }
-  .out-dot.green { background: var(--green); }
-  .out-name { font-size: 12px; font-weight: 600; line-height: 1.2; }
-  .out-sub  { font-size: 10px; color: var(--muted); margin-top: 1px; }
+/* ── PROCESS TABLE ── */
+.process-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; background: rgba(255,255,255,0.82); }
+.process-table th {
+  padding: 10px 14px; text-align: left; font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); font-weight: 500;
+  border-bottom: 2px solid var(--border-ink);
+}
+.process-table td { padding: 10px 14px; border-bottom: 1px solid rgba(176,196,220,0.3); color: var(--text); vertical-align: middle; }
+.process-table tr.inactive td { color: var(--dim); }
+.process-table tr.inactive td:first-child { text-decoration: line-through; }
 
-  /* ── TOGGLE SELECTOR ── */
-  .toggle-section { padding: 72px 0; border-top: 1px solid var(--border); }
-  .toggle-cards-row {
-    display: flex; gap: 10px; margin-bottom: 20px;
-    overflow-x: auto; padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .toggle-cards-row::-webkit-scrollbar { display: none; }
-  .toggle-card {
-    flex-shrink: 0; width: 140px;
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 16px 12px; cursor: pointer;
-    text-align: center; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-    user-select: none;
-  }
-  .toggle-card:hover { border-color: var(--accent); }
-  .toggle-card.active {
-    border-color: var(--accent); background: white;
-    box-shadow: 0 2px 14px rgba(53,79,110,0.13);
-  }
-  .tc-icon { margin-bottom: 10px; display: flex; align-items: center; justify-content: center; height: 44px; }
-  .tc-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-  .tc-profile { font-size: 10px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.06em; }
+/* ── PRODUCT SELECTOR ── */
+.product-tabs { display: flex; border-bottom: 2px solid rgba(176,196,220,0.5); }
+.product-tab {
+  padding: 14px 16px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.10em;
+  text-transform: uppercase; cursor: pointer; color: rgba(74,91,107,0.55);
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  background: transparent; user-select: none;
+}
+.product-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+.product-tab-icon {
+  width: 42px; height: 42px; border: 1.5px solid; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.6);
+}
+.product-tab.active .product-tab-icon { border-color: var(--blue); }
+.product-tab:not(.active) .product-tab-icon { border-color: var(--mat-border); }
 
-  .breakdown-grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
-    transition: opacity 0.2s;
-  }
-  .breakdown-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
-  .bc-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 14px; font-family: var(--mono); }
+.product-panel {
+  background: rgba(255,255,255,0.85); border: 1px solid rgba(176,196,220,0.5); border-top: none;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+}
+.panel-col { padding: 28px 28px; border-right: 1px solid rgba(176,196,220,0.3); }
+.panel-col:last-child { border-right: none; }
+.panel-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-bottom: 16px; }
+.score-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.score-key { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text); width: 14px; }
+.score-key.red { color: var(--red); }
+.score-bar { flex: 1; height: 4px; background: rgba(176,196,220,0.35); }
+.score-fill { height: 100%; background: var(--blue-mid); transition: width 0.4s ease; }
+.score-fill.high { background: var(--red); }
+.score-val { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 12px; text-align: right; }
+.tier-display { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
 
-  /* Complexity scores */
-  .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .score-row:last-child { margin-bottom: 0; }
-  .score-letter { font-size: 13px; font-weight: 800; color: var(--accent); font-family: var(--mono); width: 16px; flex-shrink: 0; }
-  .score-track { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-  .score-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; }
-  .score-val { font-size: 11px; font-weight: 700; color: var(--accent); font-family: var(--mono); width: 18px; text-align: right; flex-shrink: 0; }
+.proc-list { display: flex; flex-direction: column; gap: 0; }
+.proc-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(176,196,220,0.3); font-family: var(--mono); font-size: 11px; }
+.proc-row:last-child { border-bottom: none; }
+.proc-active   { color: var(--text); }
+.proc-inactive { color: var(--dim); text-decoration: line-through; }
 
-  /* Process profile */
-  .proc-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .proc-row:last-child { border-bottom: none; padding-bottom: 0; }
-  .proc-row:first-child { padding-top: 0; }
-  .proc-active { color: var(--text); font-weight: 500; }
-  .proc-inactive { color: var(--border); }
-  .tier { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; font-family: var(--mono); }
-  .tier-c1 { background: #DBEAFE; color: #1D4ED8; }
-  .tier-c2 { background: #FEF3C7; color: #92400E; }
-  .tier-c3 { background: #FEE2E2; color: #991B1B; }
-  .tier-off { background: var(--surface2); color: var(--border); font-weight: 400; }
+.cost-total { font-family: var(--mono); font-size: 30px; font-weight: 600; color: var(--text); margin-bottom: 2px; transition: opacity 0.2s; }
+.cost-currency { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.08em; margin-bottom: 16px; }
+.cost-lines { border-top: 1px solid rgba(176,196,220,0.4); }
+.cost-line { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(176,196,220,0.25); font-family: var(--mono); font-size: 11px; }
+.cost-line:last-child { border-bottom: none; }
+.cl-name { color: var(--muted); }
+.cl-val  { font-weight: 500; color: var(--text); }
+.cost-delta { margin-top: 14px; padding: 10px 14px; background: var(--red-light); border-left: 2px solid var(--red); font-family: var(--mono); font-size: 11px; color: var(--red); }
 
-  /* Cost output */
-  .cost-total { font-size: 36px; font-weight: 800; color: var(--accent); letter-spacing: -0.04em; line-height: 1; transition: opacity 0.2s; }
-  .cost-currency { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-top: 4px; margin-bottom: 18px; }
-  .cost-line { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .cost-line:last-child { border-bottom: none; }
-  .cost-line-name { color: var(--muted); }
-  .cost-line-val { font-weight: 600; font-family: var(--mono); color: var(--text); }
-  .cost-factor-badge {
-    display: inline-block; margin-top: 14px; padding: 5px 12px;
-    background: #FEE2E2; border: 1px solid #FECACA; border-radius: 6px;
-    font-size: 12px; color: #991B1B; font-family: var(--mono);
-  }
+/* ── INGESTION LOOP ── */
+.ingestion-flow { display: flex; align-items: flex-start; gap: 0; margin: 36px 0; }
+.ing-step { flex: 1; text-align: center; }
+.ing-icon { width: 52px; height: 52px; margin: 0 auto 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; background: var(--surface); }
+.ing-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 4px; }
+.ing-name  { font-size: 13px; font-weight: 600; color: var(--text); }
+.ing-arrow { display: flex; align-items: center; padding: 0 4px; margin-top: 14px; color: var(--blue); }
 
-  /* ── VIDEO PLAYER ── */
-  .video-section { padding: 72px 0; border-top: 1px solid var(--border); }
-  .video-layout { display: grid; grid-template-columns: 1fr 260px; gap: 20px; }
-  .video-main-wrap { position: relative; }
-  .video-screen {
-    background: #111; border-radius: 12px; overflow: hidden;
-    aspect-ratio: 16/9; position: relative;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .video-placeholder { color: rgba(255,255,255,0.18); font-size: 13px; font-family: var(--mono); text-align: center; line-height: 2; }
-  .video-play-overlay {
-    position: absolute; width: 56px; height: 56px; border-radius: 50%;
-    background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: background 0.15s, transform 0.15s;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-  }
-  .video-play-overlay:hover { background: white; transform: scale(1.05); }
-  .video-tag {
-    position: absolute; top: 12px; left: 12px;
-    background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
-    color: white; font-size: 10px; font-family: var(--mono);
-    padding: 4px 10px; border-radius: 4px; letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .video-bar-wrap { margin-top: 14px; }
-  .video-progress-track {
-    width: 100%; height: 3px; background: var(--border); border-radius: 2px;
-    cursor: pointer; position: relative; margin-bottom: 12px;
-  }
-  .video-progress-fill {
-    height: 100%; background: var(--accent); border-radius: 2px;
-    width: 38%; position: relative;
-  }
-  .video-progress-fill::after {
-    content: ''; position: absolute; right: -5px; top: -3.5px;
-    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
-  }
-  .video-controls-row { display: flex; align-items: center; gap: 14px; }
-  .vbtn {
-    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
-    background: var(--surface); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: border-color 0.15s, background 0.15s; flex-shrink: 0;
-  }
-  .vbtn:hover { border-color: var(--accent); background: white; }
-  .vbtn-play { background: var(--accent); border-color: var(--accent); }
-  .vbtn-play:hover { background: #2a3f58; border-color: #2a3f58; }
-  .video-time { font-size: 12px; color: var(--muted); font-family: var(--mono); }
-  .video-nav-arrows { margin-left: auto; display: flex; gap: 6px; }
-  .video-title { font-size: 15px; font-weight: 600; margin-top: 16px; }
-  .video-caption { font-size: 13px; color: var(--muted); line-height: 1.65; margin-top: 6px; max-width: 540px; }
+/* ── RESULTS CHART ── */
+.results-intro { max-width: 640px; margin-bottom: 36px; }
+.results-intro p { font-size: 16px; color: var(--muted); line-height: 1.75; }
+.chart-area { display: flex; align-items: flex-end; gap: 20px; height: 180px; border-bottom: 2px solid var(--border); padding: 0 4px; margin-bottom: 8px; }
+.chart-group { display: flex; align-items: flex-end; gap: 4px; flex: 1; }
+.bar { flex: 1; position: relative; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; }
+.bar-before { background: rgba(176,196,220,0.35); border: 1px solid var(--border); }
+.bar-after  { background: var(--blue); }
+.bar-pct { font-family: var(--mono); font-size: 9px; font-weight: 600; white-space: nowrap; position: absolute; top: -18px; }
+.bar-before .bar-pct { color: var(--muted); }
+.bar-after  .bar-pct { color: var(--blue); }
+.chart-xlabels { display: flex; gap: 20px; margin-bottom: 24px; }
+.chart-xlabel  { flex: 1; font-family: var(--mono); font-size: 10px; color: var(--dim); text-align: center; padding-top: 8px; }
+.chart-legend  { display: flex; gap: 24px; }
+.legend-item   { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.legend-swatch { width: 12px; height: 12px; flex-shrink: 0; }
+.delta-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(176,196,220,0.4); margin-top: 36px; }
+.delta-card { background: rgba(255,255,255,0.82); padding: 20px; }
+.delta-cat   { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
+.delta-val   { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
+.delta-val.positive { color: var(--blue); }
+.delta-val.negative { color: var(--red); }
+.delta-desc  { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
-  /* Thumbnail sidebar */
-  .video-thumbs { display: flex; flex-direction: column; gap: 8px; }
-  .vthumb {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 8px; padding: 10px; cursor: pointer;
-    transition: border-color 0.15s;
-  }
-  .vthumb:hover { border-color: var(--muted); }
-  .vthumb.active { border-color: var(--accent); }
-  .vthumb-img {
-    width: 58px; height: 38px; background: #1a1a1a; border-radius: 5px;
-    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.3); font-size: 13px;
-  }
-  .vthumb-title { font-size: 12px; font-weight: 600; line-height: 1.3; color: var(--text); }
-  .vthumb-dur { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+/* ── VIDEO SECTION ── */
+.video-section { padding: 72px 0; border-top: 1px solid var(--border-dim); }
+.video-layout { display: grid; grid-template-columns: 1fr 260px; gap: 20px; }
+.video-screen {
+  background: #0A0F14; border: 1px solid var(--border); overflow: hidden;
+  aspect-ratio: 16/9; position: relative; display: flex; align-items: center; justify-content: center;
+}
+.video-placeholder { font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.2); text-align: center; line-height: 2; letter-spacing: 0.08em; }
+.video-tag {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(0,0,0,0.7); color: rgba(255,255,255,0.7);
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 4px 10px;
+}
+.video-controls { margin-top: 14px; }
+.video-track { width: 100%; height: 2px; background: var(--border); margin-bottom: 14px; cursor: pointer; position: relative; }
+.video-fill  { height: 100%; background: var(--blue); width: 38%; position: relative; }
+.video-fill::after { content: ''; position: absolute; right: -5px; top: -4px; width: 10px; height: 10px; background: var(--blue); border-radius: 50%; }
+.video-ctrl-row { display: flex; align-items: center; gap: 12px; }
+.vbtn {
+  width: 32px; height: 32px; border: 1px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.15s;
+}
+.vbtn:hover { border-color: var(--blue); }
+.vbtn.play { background: var(--blue); border-color: var(--blue); }
+.vtime { font-family: var(--mono); font-size: 11px; color: var(--dim); }
+.video-nav { margin-left: auto; display: flex; gap: 6px; }
+.video-title { font-size: 15px; font-weight: 600; margin-top: 16px; color: var(--text); }
+.video-caption { font-size: 13px; color: var(--muted); line-height: 1.65; margin-top: 6px; max-width: 540px; }
+.video-thumbs { display: flex; flex-direction: column; gap: 8px; }
+.vthumb {
+  display: flex; align-items: center; gap: 10px;
+  border: 1.5px solid var(--border); padding: 10px; cursor: pointer; transition: border-color 0.15s;
+  background: var(--surface);
+}
+.vthumb:hover { border-color: var(--muted); }
+.vthumb.active { border-color: var(--blue); background: var(--blue-light); }
+.vthumb-img { width: 58px; height: 38px; background: #111; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.vthumb-title { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.vthumb-dur   { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 2px; }
 
-  /* ── BAR CHART ── */
-  .results-section { padding: 72px 0; border-top: 1px solid var(--border); }
-  .chart-setup { margin-bottom: 36px; max-width: 540px; }
-  .chart-setup p { font-size: 15px; color: var(--muted); line-height: 1.7; }
-  .chart-area { display: flex; align-items: flex-end; gap: 20px; height: 180px; border-bottom: 2px solid var(--border); margin-bottom: 10px; padding: 0 4px; }
-  .chart-group { display: flex; align-items: flex-end; gap: 4px; flex: 1; }
-  .bar {
-    flex: 1; border-radius: 4px 4px 0 0; position: relative;
-    display: flex; align-items: flex-start; justify-content: center;
-    padding-top: 4px;
-    transition: opacity 0.15s;
-  }
-  .bar:hover { opacity: 0.85; }
-  .bar-before { background: var(--surface2); border: 1px solid var(--border); }
-  .bar-after  { background: var(--accent); }
-  .bar-pct {
-    font-size: 9px; font-weight: 700; font-family: var(--mono);
-    white-space: nowrap; position: absolute; top: -18px;
-  }
-  .bar-before .bar-pct { color: var(--muted); }
-  .bar-after  .bar-pct { color: var(--accent); }
-  .chart-x { display: flex; gap: 20px; margin-bottom: 20px; }
-  .chart-x-lbl { flex: 1; font-size: 11px; color: var(--muted); text-align: center; padding-top: 8px; }
-  .chart-legend { display: flex; gap: 20px; }
-  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+/* ── CLOSING ── */
+.closing { padding: 80px 0; border-top: 1px solid var(--border-dim); text-align: center; }
+.closing blockquote {
+  font-family: var(--serif); font-size: clamp(18px, 2.8vw, 26px); font-weight: 400;
+  line-height: 1.6; color: var(--text); max-width: 620px; margin: 0 auto 20px;
+}
+.closing cite { font-family: var(--mono); font-size: 10px; color: var(--dim); font-style: normal; letter-spacing: 0.12em; text-transform: uppercase; }
 
-  /* ── Closing quote ── */
-  .closing { padding: 80px 0 60px; border-top: 1px solid var(--border); text-align: center; }
-  .closing blockquote {
-    font-size: clamp(18px, 2.8vw, 26px); font-weight: 500; line-height: 1.55;
-    letter-spacing: -0.01em; color: var(--heading); max-width: 620px; margin: 0 auto 20px;
-  }
-  .closing cite { font-size: 11px; color: var(--muted); font-style: normal; text-transform: uppercase; letter-spacing: 0.1em; font-family: var(--mono); }
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--border-dim); padding: 28px 0; }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+footer a { font-family: var(--mono); font-size: 11px; color: var(--dim); text-decoration: none; }
+footer a:hover { color: var(--text); }
 
-  /* ── Footer ── */
-  footer { border-top: 1px solid var(--border); padding: 28px 0; font-size: 12px; color: var(--muted); }
-  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-  footer a { color: var(--muted); text-decoration: none; }
-  footer a:hover { color: var(--text); }
+/* ── SCROLL REVEAL ── */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal.on { opacity: 1; transform: none; }
+.d1 { transition-delay: 0.05s; } .d2 { transition-delay: 0.10s; } .d3 { transition-delay: 0.16s; }
 
-  /* ── Scroll reveal ── */
-  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.55s ease, transform 0.55s ease; }
-  .reveal.on { opacity: 1; transform: none; }
-  .d1 { transition-delay: 0.05s; } .d2 { transition-delay: 0.12s; }
-  .d3 { transition-delay: 0.18s; } .d4 { transition-delay: 0.24s; }
-
-  /* ── Responsive ── */
-  @media (max-width: 760px) {
-    .arch-diagram { grid-template-columns: 1fr; }
-    .arch-arrow { transform: rotate(90deg); margin: 10px auto; }
-    .breakdown-grid { grid-template-columns: 1fr; }
-    .video-layout { grid-template-columns: 1fr; }
-    .video-thumbs { flex-direction: row; overflow-x: auto; }
-  }
-  </style>
+/* ── RESPONSIVE ── */
+@media (max-width: 760px) {
+  .nav-anchors { display: none; }
+  .wrap, .wrap-wide, .table-surface { padding-left: 20px; padding-right: 20px; }
+  .table-surface { padding: 28px 20px; }
+  .mat-pad, .mat-header { padding-left: 24px; padding-right: 24px; }
+  .arch-schematic { grid-template-columns: 1fr; padding: 24px; }
+  .arch-arrow-col { transform: rotate(90deg); margin: 8px auto; }
+  .driver-grid { grid-template-columns: 1fr; }
+  .decomp-grid  { grid-template-columns: 1fr; }
+  .decomp-view { border-right: none !important; }
+  .driver-score-row { grid-template-columns: 1fr 1fr; }
+  .product-panel { grid-template-columns: 1fr; }
+  .video-layout { grid-template-columns: 1fr; }
+  .delta-cards { grid-template-columns: 1fr; }
+  .old-model { grid-template-columns: 1fr; }
+  .flow-arrow { transform: rotate(90deg); margin: 8px auto; }
+  .arch-engine { display: none; }
+  .ingestion-flow { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .ing-arrow { transform: rotate(90deg); margin: 0 auto; }
+}
+</style>
 </head>
 <body>
 
@@ -393,27 +458,36 @@
 <nav>
   <div class="nav-inner">
     <a href="../" class="nav-back">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M9 2L4 7l5 5"/>
-      </svg>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2L4 7l5 5"/></svg>
       Fabio Fuentes
     </a>
-    <span class="nav-sep">/</span>
     <span class="nav-title">Manufacturing Cost Model</span>
+    <div class="nav-anchors">
+      <a href="#s1" class="nav-anchor">Problem</a>
+      <a href="#model" class="nav-anchor">Model</a>
+      <a href="#drivers" class="nav-anchor">Drivers</a>
+      <a href="#selector" class="nav-anchor">Engine</a>
+      <a href="#knowledge" class="nav-anchor">Knowledge</a>
+      <a href="#results" class="nav-anchor">Results</a>
+    </div>
   </div>
 </nav>
 
 <!-- HERO -->
-<section class="hero dot-grid">
+<section class="hero">
   <div class="wrap">
-    <div class="eyebrow"><span class="eyebrow-line"></span>Manufacturing · Cost Modeling · AI</div>
-    <h1>You can't price what<br>you can't <em>decompose</em>.</h1>
-    <p class="hero-sub">A stainless steel manufacturer in Chile. 1,300 custom SKUs. Thirty years of pricing by intuition. This is how we turned one expert's knowledge into a computational cost engine.</p>
-    <div class="hero-stats">
-      <div><div class="stat-val">1,300+</div><div class="stat-lbl">Custom SKUs</div></div>
-      <div><div class="stat-val">11</div><div class="stat-lbl">Manufacturing Processes</div></div>
-      <div><div class="stat-val">4</div><div class="stat-lbl">Complexity Drivers</div></div>
-      <div><div class="stat-val">30 yr</div><div class="stat-lbl">Expert Intuition Formalized</div></div>
+    <div class="hero-eyebrow reveal">Manufacturing · Cost Modeling · AI</div>
+    <h1 class="reveal d1">You can't price what<br>you can't <em>decompose</em>.</h1>
+    <p class="hero-sub reveal d2">A stainless steel manufacturer in Chile. 1,300 custom SKUs. Thirty years of pricing by intuition. This is how we turned one expert's knowledge into a computational cost engine.</p>
+    <div class="hero-equation reveal d3">
+      cost(p) = Σᵢ [ t(process_i, tier_i) × rate_i + consumables_i ]<br>
+      <span class="eq-sub">where tier_i ∈ {C1..C5} = f( G(p), D(p), C(p), X(p) )</span>
+    </div>
+    <div class="hero-stats reveal">
+      <div><span class="stat-num">1,300+</span><div class="stat-lbl">Custom SKUs</div></div>
+      <div><span class="stat-num">11</span><div class="stat-lbl">Manufacturing Processes</div></div>
+      <div><span class="stat-num">4</span><div class="stat-lbl">Complexity Drivers</div></div>
+      <div><span class="stat-num">30 yr</span><div class="stat-lbl">Expert Intuition Formalized</div></div>
     </div>
   </div>
 </section>
@@ -421,60 +495,44 @@
 <!-- S1: THE FACTORY -->
 <section class="story" id="s1">
   <div class="wrap">
-    <div class="section-label reveal">Section 01</div>
-    <div class="section-num reveal">01</div>
-    <h2 class="section-title reveal">The Factory That Prices Products Out of Thin Air</h2>
-    <p class="section-deck reveal">A Chilean stainless steel manufacturer. Every product different. One pricing method for all of them.</p>
-
+    <div class="story-num reveal">S.01 · The Problem</div>
+    <h2 class="reveal d1">The Factory That Prices Products Out of Thin Air</h2>
+    <p class="deck reveal d2">A Chilean stainless steel manufacturer. Every product different. One pricing method for all of them.</p>
     <div class="prose">
-      <p class="reveal">Ingeniería en Aceros (Dulox) makes custom stainless steel products for restaurants, industrial kitchens, hotels, and construction sites. Every product is different — different dimensions, different processes, different complexity. For years, the pricing method has been: <strong>cost of materials × a factor</strong>. That factor absorbs all factory overhead spread uniformly across everything.</p>
+      <p class="reveal">Ingeniería en Aceros makes custom stainless steel products for restaurants, industrial kitchens, hotels, and construction sites across Chile. Everything is custom — different dimensions, different finishes, different manufacturing processes for every single order. A restaurant campana, a cylindrical trash bin with a pedal mechanism, an industrial counter with built-in refrigeration. They are not the same product. Not even close.</p>
+      <p class="reveal">For thirty years, the pricing method has been: <strong>cost of materials × a factor</strong>. That factor is supposed to absorb all factory overhead — operators, machines, time, consumables — spread uniformly across everything.</p>
     </div>
 
-    <!-- Old model flow -->
-    <div class="old-model reveal" style="margin: 36px 0; max-width: 760px;">
+    <div class="old-model reveal" style="margin: 36px 0;">
       <div class="flow-col">
-        <div class="flow-col-label">Input</div>
+        <div class="flow-col-label">The Input</div>
         <div class="flow-item">
           <div class="flow-num">1</div>
-          <div>
-            <div class="flow-text-title">Material cost</div>
-            <div class="flow-text-sub">Steel weight × price per kg</div>
-          </div>
+          <div><div class="flow-text-title">Material cost</div><div class="flow-text-sub">Steel weight × price per kg</div></div>
         </div>
         <div class="flow-item">
           <div class="flow-num">×</div>
-          <div>
-            <div class="flow-text-title">The Factor</div>
-            <div class="flow-text-sub">Single multiplier — absorbs all overhead</div>
-          </div>
+          <div><div class="flow-text-title">The Factor</div><div class="flow-text-sub">Single multiplier absorbing all overhead</div></div>
         </div>
       </div>
-      <div class="arrow-mid">
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-          <path d="M4 20h28M24 13l8 7-8 7" stroke="#78766E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+      <div class="flow-arrow">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M4 20h28M24 13l8 7-8 7" stroke="#8A9BAA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div class="flow-col">
-        <div class="flow-col-label">Output</div>
+        <div class="flow-col-label">The Output</div>
         <div class="flow-item">
           <div class="flow-num warn">?</div>
-          <div>
-            <div class="flow-text-title">The Price</div>
-            <div class="flow-text-sub">Same formula for a simple shelf and a complex cylindrical bin with interior welds</div>
-          </div>
+          <div><div class="flow-text-title">The Price</div><div class="flow-text-sub">Same formula for a simple shelf and a complex cylindrical bin with interior welds</div></div>
         </div>
         <div class="flow-item">
           <div class="flow-num bad">?</div>
-          <div>
-            <div class="flow-text-title">Margin (unknown)</div>
-            <div class="flow-text-sub">Works on average. Nobody knows which products lose money.</div>
-          </div>
+          <div><div class="flow-text-title">Margin (unknown)</div><div class="flow-text-sub">Works on average. Nobody knows which products lose money.</div></div>
         </div>
       </div>
     </div>
 
-    <div class="callout reveal">
-      They've been profitable for years. So the factor works — on average. But they have no idea which products make money and which don't. And when the salesperson quotes a complex product too low, nobody catches it until the order is halfway through production.
+    <div class="callout-block reveal">
+      They've been profitable for years. So the factor works — on average. The factory makes money overall. But they have no idea which products make money and which ones don't. They can't quote competitively because they don't know their real costs. And when the salesperson quotes a complex product too low, nobody catches it until the order is halfway through production.
     </div>
   </div>
 </section>
@@ -482,472 +540,488 @@
 <!-- S2: DECOMPOSITION -->
 <section class="story" id="s2">
   <div class="wrap">
-    <div class="section-label reveal">Section 02</div>
-    <div class="section-num reveal">02</div>
-    <h2 class="section-title reveal">The Real Problem Is Decomposition</h2>
-    <p class="section-deck reveal">This isn't a pricing problem. It's a decomposition problem.</p>
-
+    <div class="story-num reveal">S.02 · The Insight</div>
+    <h2 class="reveal d1">The Real Problem Is Decomposition</h2>
+    <p class="deck reveal d2">This isn't a pricing problem. It's a decomposition problem.</p>
     <div class="prose">
-      <p class="reveal">Before you can price something, you have to be able to decompose it — break it into its cost primitives. For a stainless steel product: materials, direct labor per process, machine time, consumables. The reason the factor has worked is that nobody had done this decomposition. It requires sitting with the production manager and mapping out what happens to a product from raw steel sheet to finished piece.</p>
-      <p class="reveal">The real challenge: every product is custom. You need a model that <em>generalizes</em> — that can take any new product and estimate cost without having measured it before.</p>
+      <p class="reveal">Before you can price something, you have to decompose it — break it into its cost primitives. For a stainless steel product: materials, direct labor per process, machine time, consumables. The reason the factor has worked is that nobody had done this decomposition. It's hard. It requires sitting with the production manager and actually mapping out what happens to a product from raw steel sheet to finished piece.</p>
+      <p class="reveal">The real challenge: every product is custom, so you can't have a fixed price list. You need a model that <em>generalizes</em> — that can take any new product and estimate cost without having measured it before.</p>
     </div>
-
-    <div class="dark-box reveal">
-      <div class="db-label">The structural insight</div>
+    <div class="insight-box reveal">
+      <div class="insight-label">The structural decision</div>
       <p>Classify products into profiles (what processes they go through) and complexity tiers (how hard each process is for this specific product). If you know both, you can compute cost. If you can generalize both to new products, you have a pricing engine.</p>
     </div>
   </div>
 </section>
 
-<!-- MODEL OVERVIEW (architecture diagram) -->
-<section class="arch-section dot-grid" id="model-overview">
-  <div class="wrap-wide">
-    <div class="arch-inner">
-      <div class="arch-header reveal">
-        <div class="eyebrow" style="justify-content:center;"><span class="eyebrow-line"></span>The Cost Model<span class="eyebrow-line"></span></div>
-        <div class="arch-subtitle" style="margin-top:8px;">perfil_proceso × complexity_drivers → real_cost</div>
+<!-- S3: CATEGORIES (on mat) -->
+<div id="model"></div>
+<div class="table-surface">
+  <div class="blueprint-mat">
+    <div class="mat-header">
+      <div>
+        <div class="sys-label" style="margin-bottom:8px;">S.03 · Categories</div>
+        <div class="mat-section-title">What a product <em>is</em> determines what it costs</div>
+        <div class="mat-sub">perfil_proceso — manufacturing identity, not commercial category</div>
       </div>
-
-      <div class="arch-diagram reveal">
-
-        <!-- LEFT: Product inputs -->
-        <div class="arch-inputs">
-          <div class="arch-col-hdr">Product Inputs</div>
-
-          <div class="arch-row">
-            <div class="arch-icon">
-              <!-- Cylindrical bin SVG -->
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <ellipse cx="16" cy="8" rx="9" ry="3"/>
-                <path d="M7 8v16c0 1.66 4.03 3 9 3s9-1.34 9-3V8"/>
-                <path d="M7 16c0 1.66 4.03 3 9 3s9-1.34 9-3"/>
-              </svg>
-            </div>
-            <div>
-              <div class="arch-row-name">Cylindrical Bin</div>
-              <div class="arch-row-sub">cilindrado profile</div>
-            </div>
-          </div>
-
-          <div class="arch-row">
-            <div class="arch-icon">
-              <!-- Shelf SVG -->
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="13" width="24" height="3" rx="1"/>
-                <path d="M8 16v8M24 16v8"/>
-                <rect x="4" y="6" width="24" height="3" rx="1"/>
-              </svg>
-            </div>
-            <div>
-              <div class="arch-row-name">Wall Shelf</div>
-              <div class="arch-row-sub">panel profile</div>
-            </div>
-          </div>
-
-          <div class="arch-row">
-            <div class="arch-icon">
-              <!-- Campana SVG -->
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 22 Q6 14 16 8 Q26 14 24 22Z"/>
-                <rect x="6" y="22" width="20" height="3" rx="1"/>
-                <line x1="16" y1="5" x2="16" y2="8"/>
-              </svg>
-            </div>
-            <div>
-              <div class="arch-row-name">Campana</div>
-              <div class="arch-row-sub">exhaust profile</div>
-            </div>
-          </div>
-
-          <div class="arch-row">
-            <div class="arch-icon">
-              <!-- Counter SVG -->
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="10" width="24" height="14" rx="2"/>
-                <line x1="4" y1="16" x2="28" y2="16"/>
-                <path d="M10 10V9a2 2 0 0 1 4 0v1M18 10V9a2 2 0 0 1 4 0v1"/>
-              </svg>
-            </div>
-            <div>
-              <div class="arch-row-name">Counter</div>
-              <div class="arch-row-sub">flat-complex profile</div>
-            </div>
-          </div>
-
-          <div class="arch-row">
-            <div class="arch-icon">
-              <!-- Refrigerator SVG -->
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="7" y="4" width="18" height="24" rx="2"/>
-                <line x1="7" y1="14" x2="25" y2="14"/>
-                <line x1="12" y1="9" x2="12" y2="12"/>
-                <line x1="12" y1="18" x2="12" y2="22"/>
-              </svg>
-            </div>
-            <div>
-              <div class="arch-row-name">Refrigerator</div>
-              <div class="arch-row-sub">cooling profile</div>
-            </div>
-          </div>
+      <div class="mat-section-num">03</div>
+    </div>
+    <div class="mat-pad">
+      <p style="font-size:15px; color:var(--muted); max-width:680px; line-height:1.75; margin-bottom:32px;">First step: go through all 1,300+ SKUs and classify each one into a <strong style="color:var(--text);">perfil_proceso</strong> — a process profile. A process profile says: <em>this type of product goes through these specific manufacturing processes.</em> Two products that look nothing alike can share a profile if they go through the same factory sequence. A cylindrical bin and a restaurant pot are both cilindrado profile.</p>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(176,196,220,0.4);">
+        <div style="background:rgba(255,255,255,0.78); padding:20px;">
+          <div class="sys-label" style="margin-bottom:10px;">Cilindrado</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;">trazado → corte → cilindrado → soldadura → pulido → QC</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--dim);">Cylindrical bins · pots · drums · round containers</div>
         </div>
-
-        <!-- ARROW LEFT -->
-        <div class="arch-arrow">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <path d="M4 20h28M24 13l8 7-8 7" stroke="#78766E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+        <div style="background:rgba(255,255,255,0.78); padding:20px;">
+          <div class="sys-label" style="margin-bottom:10px;">Panel plano</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;">trazado → corte → plegado → soldadura → QC</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--dim);">Shelves · panels · doors · flat enclosures</div>
         </div>
-
-        <!-- CENTER: Engine -->
-        <div class="engine-box">
-          <div class="engine-header">
-            <div class="engine-label">Manufacturing Cost Engine</div>
-            <div class="engine-name">Process Intelligence Model</div>
-          </div>
-          <div class="engine-split">
-            <div class="engine-half">
-              <div class="engine-half-lbl">Process Layer</div>
-              <div class="engine-half-name">Profile Classifier</div>
-            </div>
-            <div class="engine-half gold-half">
-              <div class="engine-half-lbl">Complexity Layer</div>
-              <div class="engine-half-name">G × D × C × X Engine</div>
-            </div>
-          </div>
-          <div class="engine-loops">
-            <div class="engine-loop"></div>
-            <div class="engine-loop"></div>
-            <div class="engine-loop"></div>
-            <div class="engine-loop"></div>
-            <div class="engine-loop"></div>
-          </div>
-          <div class="engine-footer">11 processes × 3 tiers × calibrated time estimates</div>
+        <div style="background:rgba(255,255,255,0.78); padding:20px;">
+          <div class="sys-label" style="margin-bottom:10px;">Campana</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;">trazado → corte → plegado → soldadura → pulido → QC</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--dim);">Exhaust hoods · extraction units · funnels</div>
         </div>
-
-        <!-- ARROW RIGHT -->
-        <div class="arch-arrow">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <path d="M4 20h28M24 13l8 7-8 7" stroke="#78766E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+        <div style="background:rgba(255,255,255,0.78); padding:20px;">
+          <div class="sys-label" style="margin-bottom:10px;">Mesón complejo</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;">trazado → corte laser → plegado → soldadura → QC</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--dim);">Counters · workstations · multi-surface platforms</div>
         </div>
-
-        <!-- RIGHT: Outputs -->
-        <div class="arch-outputs">
-          <div class="arch-col-hdr">Outputs</div>
-          <div class="arch-out-row">
-            <div class="out-dot steel"></div>
-            <div>
-              <div class="out-name">Accurate Quote</div>
-              <div class="out-sub">breakeven + margin target</div>
-            </div>
-          </div>
-          <div class="arch-out-row">
-            <div class="out-dot amber"></div>
-            <div>
-              <div class="out-name">Margin by Category</div>
-              <div class="out-sub">first visibility in 30 years</div>
-            </div>
-          </div>
-          <div class="arch-out-row">
-            <div class="out-dot green"></div>
-            <div>
-              <div class="out-name">Competitive Pricing</div>
-              <div class="out-sub">market-rate confidence</div>
-            </div>
-          </div>
-          <div class="arch-out-row">
-            <div class="out-dot steel"></div>
-            <div>
-              <div class="out-name">Knowledge Transfer</div>
-              <div class="out-sub">onboarding in weeks, not years</div>
-            </div>
-          </div>
+        <div style="background:rgba(255,255,255,0.78); padding:20px;">
+          <div class="sys-label" style="margin-bottom:10px;">Refrigerado</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;">trazado → corte → plegado → soldadura → refrigeración → QC</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--dim);">Cold counters · refrigerated cabinets</div>
         </div>
-
-      </div><!-- end arch-diagram -->
+        <div style="background:rgba(255,255,255,0.78); padding:20px;">
+          <div class="sys-label" style="margin-bottom:10px;">Grabado</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;">trazado → corte → grabado laser → plegado → QC</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--dim);">Logo-etched pieces · engraved components</div>
+        </div>
+      </div>
+      <p style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:16px;letter-spacing:0.04em;">Decision: the smallest number of profiles that captures real cost variation. Too many and the model becomes unmaintainable. Too few and it loses resolution.</p>
     </div>
   </div>
-</section>
+</div>
 
-<!-- S3: PROCESS PROFILES (kept brief, toggle is the demo) -->
-<section class="story" id="s3">
-  <div class="wrap">
-    <div class="section-label reveal">Section 03</div>
-    <div class="section-num reveal">03</div>
-    <h2 class="section-title reveal">What a Product <em>Is</em> Determines What It Costs</h2>
-    <p class="section-deck reveal">Step one: classify every SKU by its manufacturing identity — not its commercial category.</p>
-    <div class="prose">
-      <p class="reveal">Two products that look nothing alike can share a process profile if they go through the same factory operations. A cylindrical trash bin and a custom pot both go through rolling, welding, and polishing — their profiles are identical. The grouping is by manufacturing DNA, not shape or appearance.</p>
+<!-- ARCHITECTURE DIAGRAM (on mat) -->
+<div class="table-surface">
+  <div class="blueprint-mat">
+    <div class="mat-header">
+      <div>
+        <div class="sys-label" style="margin-bottom:8px;">System Architecture</div>
+        <div class="mat-section-title">The <em>decomposition</em> engine</div>
+        <div class="mat-sub">perfil_proceso × complexity_drivers → real_cost</div>
+      </div>
+      <div class="mat-section-num" style="font-size:48px;">arch</div>
     </div>
-  </div>
-</section>
-
-<!-- S4: FOUR DRIVERS (abbreviated) -->
-<section class="story" id="s4">
-  <div class="wrap">
-    <div class="section-label reveal">Section 04</div>
-    <div class="section-num reveal">04</div>
-    <h2 class="section-title reveal">Four Numbers That Explain Complexity</h2>
-    <p class="section-deck reveal">Every product gets scored on four physical parameters. The scores feed into each process's complexity calculation.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:680px;">
-      <div class="breakdown-card reveal d1">
-        <div style="font-size:48px;font-weight:800;color:var(--border);letter-spacing:-0.04em;line-height:1;margin-bottom:8px;">G</div>
-        <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Geometry</div>
-        <div style="font-size:13px;color:var(--muted);">Surface area. Larger products require more cutting, welding, polishing, material.</div>
+    <div class="arch-schematic">
+      <div class="arch-node-list">
+        <div class="sys-label" style="margin-bottom:8px; padding-left:4px;">Product Inputs</div>
+        <div class="arch-node">
+          <div class="arch-node-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><ellipse cx="11" cy="5" rx="7" ry="2.5"/><path d="M4 5v12c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5V5"/><path d="M4 11c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5"/></svg></div>
+          <div><div class="arch-node-text">Cylindrical Bin</div><div class="arch-node-sub">cilindrado</div></div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="9" width="18" height="4" rx="0.5"/><path d="M5 13v5M17 13v5"/></svg></div>
+          <div><div class="arch-node-text">Wall Shelf</div><div class="arch-node-sub">panel plano</div></div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 18 Q4 10 11 5 Q18 10 17 18Z"/><rect x="4" y="18" width="14" height="2" rx="0"/></svg></div>
+          <div><div class="arch-node-text">Campana</div><div class="arch-node-sub">campana</div></div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="18" height="10" rx="0.5"/><line x1="2" y1="12" x2="20" y2="12"/><line x1="6" y1="12" x2="6" y2="17"/><line x1="16" y1="12" x2="16" y2="17"/></svg></div>
+          <div><div class="arch-node-text">Counter</div><div class="arch-node-sub">mesón complejo</div></div>
+        </div>
       </div>
-      <div class="breakdown-card reveal d2">
-        <div style="font-size:48px;font-weight:800;color:var(--border);letter-spacing:-0.04em;line-height:1;margin-bottom:8px;">D</div>
-        <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Density</div>
-        <div style="font-size:13px;color:var(--muted);">Material thickness. 1mm vs 5mm steel demands different machines, operators, and consumables.</div>
+      <div class="arch-arrow-col">
+        <svg width="48" height="2"><line x1="0" y1="1" x2="38" y2="1" stroke="#1B6FE8" stroke-width="1.5"/><polygon points="38,0 48,1 38,2" fill="#1B6FE8"/></svg>
+        <span class="arch-arrow-label">classify</span>
       </div>
-      <div class="breakdown-card reveal d3">
-        <div style="font-size:48px;font-weight:800;color:var(--border);letter-spacing:-0.04em;line-height:1;margin-bottom:8px;">C</div>
-        <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Components</div>
-        <div style="font-size:13px;color:var(--muted);">Part count. 4 components vs 12 is a fundamentally different assembly challenge.</div>
+      <div class="arch-engine">
+        <div class="engine-badge">Manufacturing Cost Engine</div>
+        <div class="engine-grid">
+          <div class="engine-half">Profile<br>Classifier</div>
+          <div class="engine-half em">G × D × C × X<br>Engine</div>
+        </div>
+        <div style="display:flex;justify-content:center;margin-bottom:10px;">
+          <svg width="60" height="14" viewBox="0 0 60 14"><path d="M5,7 Q15,1 25,7 Q35,13 45,7 Q55,1 60,7" fill="none" stroke="rgba(27,111,232,0.5)" stroke-width="1.5"/></svg>
+        </div>
+        <div class="engine-footer">11 processes · 5 tiers · calibrated time estimates</div>
       </div>
-      <div class="breakdown-card reveal d4">
-        <div style="font-size:48px;font-weight:800;color:var(--border);letter-spacing:-0.04em;line-height:1;margin-bottom:8px;">X</div>
-        <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Expert Variables</div>
-        <div style="font-size:13px;color:var(--muted);">Everything operators know intuitively — interior welds, mirror polish, logo etching. 30 years of intuition, formalized.</div>
+      <div class="arch-arrow-col">
+        <svg width="48" height="2"><line x1="0" y1="1" x2="38" y2="1" stroke="#1B6FE8" stroke-width="1.5"/><polygon points="38,0 48,1 38,2" fill="#1B6FE8"/></svg>
+        <span class="arch-arrow-label">compute</span>
+      </div>
+      <div class="arch-outputs">
+        <div class="sys-label" style="margin-bottom:8px;">Outputs</div>
+        <div class="arch-output"><div class="arch-output-title">Accurate Quote</div><div class="arch-output-sub">breakeven + margin target</div></div>
+        <div class="arch-output"><div class="arch-output-title">Margin by Category</div><div class="arch-output-sub">first visibility in 30 years</div></div>
+        <div class="arch-output"><div class="arch-output-title">Competitive Pricing</div><div class="arch-output-sub">market-rate confidence</div></div>
+        <div class="arch-output"><div class="arch-output-title">Knowledge Transfer</div><div class="arch-output-sub">onboarding in weeks, not years</div></div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- S5: TOGGLE SELECTOR (replaces the static table) -->
-<section class="toggle-section dot-grid" id="s5">
-  <div class="wrap">
-    <div class="section-label reveal">Section 05</div>
-    <div class="section-num reveal">05</div>
-    <h2 class="section-title reveal">Eleven Processes, Three Tiers Each</h2>
-    <p class="section-deck reveal">Select a product to see its process profile, complexity scores, and total cost breakdown.</p>
+<!-- S4: FOUR DRIVERS (on mat) -->
+<div id="drivers"></div>
+<div class="table-surface">
+  <div class="blueprint-mat">
+    <div class="mat-header">
+      <div>
+        <div class="sys-label" style="margin-bottom:8px;">S.04 · Four Complexity Drivers</div>
+        <div class="mat-section-title">Four numbers that explain <em>difficulty</em></div>
+        <div class="mat-sub">instead of asking "how complex?" — ask what physical parameters drive difficulty</div>
+      </div>
+      <div class="mat-section-num">04</div>
+    </div>
+    <div class="mat-pad">
+      <p style="font-size:15px;color:var(--muted);max-width:680px;line-height:1.75;margin-bottom:32px;">Once you know the profile (which processes), you still need to know the complexity — how hard each process is for this specific product. The insight: instead of asking "how complex is this product overall," ask what are the physical parameters that drive difficulty in manufacturing? We landed on four universal drivers, each scored 1–5.</p>
+      <div class="driver-grid">
+        <div class="driver-card">
+          <div class="driver-ghost">G</div>
+          <div class="driver-name">Geometry</div>
+          <div class="driver-def">surface_area(mm²) → scale</div>
+          <div class="driver-body">The amount of steel the product consumes. Larger products require more cutting, more welding, more polishing, more material. Surface area is the most direct proxy for production time.</div>
+        </div>
+        <div class="driver-card">
+          <div class="driver-ghost">D</div>
+          <div class="driver-name">Density</div>
+          <div class="driver-def">thickness(mm) → difficulty</div>
+          <div class="driver-body">A 1mm product is not the same as a 5mm product. Thicker steel is harder to cut, harder to bend, requires more powerful machines, demands more skilled operators. It also changes the consumable profile — welding wire, argon, blade wear.</div>
+        </div>
+        <div class="driver-card">
+          <div class="driver-ghost">C</div>
+          <div class="driver-name">Components</div>
+          <div class="driver-def">part_count → assembly complexity</div>
+          <div class="driver-body">A product with 4 components versus 12 is fundamentally different. More components means more joints, more welding, more fit-up, more chances for dimensional error. Every join is a decision point for the operator.</div>
+        </div>
+        <div class="driver-card">
+          <div class="driver-ghost red">X</div>
+          <div class="driver-name red">Expert Variables</div>
+          <div class="driver-def red">flags[] → intuition formalized</div>
+          <div class="driver-body">Everything operators know intuitively that doesn't fit neatly into geometry, density, or count. Interior welds. Mirror polish. Logo etching. Refrigeration systems. These are binary flags that add points to the system — the formalization of 30 years of "it depends."</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:16px 20px;background:rgba(255,255,255,0.7);border:1px solid rgba(176,196,220,0.5);">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--muted);">Each process uses a subset of the four drivers. Welding uses C and X. Polishing uses G and X. Bending uses G, D, and C. Each combination gives a score. That score maps to a complexity tier: C1 through C5. Each tier has calibrated time estimates derived from real production measurements.</span>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <!-- Product tabs -->
-    <div class="toggle-cards-row reveal" id="toggle-row">
-
-      <div class="toggle-card active" data-product="bin">
-        <div class="tc-icon">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="22" cy="11" rx="12" ry="4"/>
-            <path d="M10 11v22c0 2.2 5.37 4 12 4s12-1.8 12-4V11"/>
-            <path d="M10 22c0 2.2 5.37 4 12 4s12-1.8 12-4"/>
+<!-- PRODUCT DECOMPOSITION (on mat) -->
+<div class="table-surface">
+  <div class="blueprint-mat">
+    <div class="mat-header">
+      <div>
+        <div class="sys-label" style="margin-bottom:8px;">S.04 · Product Decomposition</div>
+        <div class="mat-section-title">Reading the <em>object</em></div>
+        <div class="mat-sub">example: cylindrical trash bin · cilindrado profile · interior welds + mirror polish</div>
+      </div>
+      <div class="mat-section-num">04b</div>
+    </div>
+    <div class="mat-pad">
+      <div class="decomp-grid">
+        <!-- Isometric: G -->
+        <div class="decomp-view">
+          <div class="decomp-view-label">Isometric · Geometry (G)</div>
+          <svg width="100%" height="190" viewBox="0 0 290 190">
+            <ellipse cx="145" cy="42" rx="72" ry="23" fill="none" stroke="#1255C8" stroke-width="1.5"/>
+            <ellipse cx="145" cy="150" rx="72" ry="23" fill="none" stroke="#1255C8" stroke-width="1.5"/>
+            <line x1="73" y1="42" x2="73" y2="150" stroke="#1255C8" stroke-width="1.5"/>
+            <line x1="217" y1="42" x2="217" y2="150" stroke="#1255C8" stroke-width="1.5"/>
+            <ellipse cx="145" cy="93" rx="72" ry="23" fill="none" stroke="#1255C8" stroke-width="0.75" stroke-dasharray="3 3"/>
+            <!-- Height dim -->
+            <line x1="54" y1="42" x2="54" y2="150" stroke="#1255C8" stroke-width="1"/>
+            <line x1="50" y1="42" x2="58" y2="42" stroke="#1255C8" stroke-width="1"/>
+            <line x1="50" y1="150" x2="58" y2="150" stroke="#1255C8" stroke-width="1"/>
+            <text x="20" y="100" fill="#1255C8" font-family="'IBM Plex Mono',monospace" font-size="9">600mm</text>
+            <!-- Width dim -->
+            <line x1="73" y1="172" x2="217" y2="172" stroke="#1255C8" stroke-width="1"/>
+            <line x1="73" y1="168" x2="73" y2="176" stroke="#1255C8" stroke-width="1"/>
+            <line x1="217" y1="168" x2="217" y2="176" stroke="#1255C8" stroke-width="1"/>
+            <text x="120" y="184" fill="#1255C8" font-family="'IBM Plex Mono',monospace" font-size="9">Ø 480mm</text>
+            <!-- G callout -->
+            <line x1="218" y1="42" x2="260" y2="30" stroke="#1B6FE8" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="262" y="30" fill="#4A5B6B" font-family="'IBM Plex Mono',monospace" font-size="9">G = 3</text>
+            <text x="262" y="40" fill="#4A5B6B" font-family="'IBM Plex Mono',monospace" font-size="8">large surface</text>
           </svg>
         </div>
-        <div class="tc-name">Cylindrical Bin</div>
-        <div class="tc-profile">cilindrado</div>
-      </div>
-
-      <div class="toggle-card" data-product="shelf">
-        <div class="tc-icon">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="18" width="34" height="4" rx="1.5"/>
-            <path d="M11 22v10M33 22v10"/>
-            <rect x="5" y="8" width="34" height="4" rx="1.5"/>
+        <!-- Front: C -->
+        <div class="decomp-view">
+          <div class="decomp-view-label">Front · Components (C)</div>
+          <svg width="100%" height="190" viewBox="0 0 290 190">
+            <rect x="85" y="22" width="120" height="132" fill="none" stroke="#1255C8" stroke-width="1.5"/>
+            <line x1="85" y1="40" x2="205" y2="40" stroke="#1255C8" stroke-width="1"/>
+            <rect x="120" y="154" width="50" height="12" fill="none" stroke="#1255C8" stroke-width="1"/>
+            <circle cx="105" cy="31" r="6" fill="none" stroke="#1B6FE8" stroke-width="1.5"/>
+            <circle cx="185" cy="31" r="6" fill="none" stroke="#1B6FE8" stroke-width="1.5"/>
+            <line x1="85" y1="93" x2="205" y2="93" stroke="#C42B2B" stroke-width="1.5" stroke-dasharray="3 2"/>
+            <!-- callouts -->
+            <line x1="111" y1="26" x2="250" y2="14" stroke="#1B6FE8" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="252" y="14" fill="#4A5B6B" font-family="'IBM Plex Mono',monospace" font-size="9">① lid</text>
+            <line x1="145" y1="93" x2="250" y2="60" stroke="#1B6FE8" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="252" y="60" fill="#4A5B6B" font-family="'IBM Plex Mono',monospace" font-size="9">② inner ring</text>
+            <line x1="145" y1="154" x2="250" y2="108" stroke="#1B6FE8" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="252" y="108" fill="#4A5B6B" font-family="'IBM Plex Mono',monospace" font-size="9">③ foot pedal</text>
+            <text x="8" y="98" fill="#C42B2B" font-family="'IBM Plex Mono',monospace" font-size="8">interior</text>
+            <text x="8" y="108" fill="#C42B2B" font-family="'IBM Plex Mono',monospace" font-size="8">weld</text>
+            <line x1="42" y1="93" x2="85" y2="93" stroke="#C42B2B" stroke-width="1" stroke-dasharray="3 2"/>
+            <text x="74" y="180" fill="#1255C8" font-family="'IBM Plex Mono',monospace" font-size="9" font-weight="600">C = 4  ·  X+1 (interior weld)</text>
           </svg>
         </div>
-        <div class="tc-name">Wall Shelf</div>
-        <div class="tc-profile">panel</div>
-      </div>
-
-      <div class="toggle-card" data-product="campana">
-        <div class="tc-icon">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 31 Q9 19 22 11 Q35 19 33 31Z"/>
-            <rect x="8" y="31" width="28" height="4" rx="1.5"/>
-            <line x1="22" y1="6" x2="22" y2="11"/>
+        <!-- Top: D -->
+        <div class="decomp-view">
+          <div class="decomp-view-label">Top · Density (D)</div>
+          <svg width="100%" height="190" viewBox="0 0 290 190">
+            <circle cx="145" cy="92" r="72" fill="none" stroke="#1255C8" stroke-width="1.5"/>
+            <circle cx="145" cy="92" r="65" fill="none" stroke="#1255C8" stroke-width="1" stroke-dasharray="3 2"/>
+            <circle cx="100" cy="92" r="9" fill="none" stroke="#1B6FE8" stroke-width="1.5"/>
+            <circle cx="190" cy="92" r="9" fill="none" stroke="#1B6FE8" stroke-width="1.5"/>
+            <line x1="145" y1="20" x2="145" y2="164" stroke="#1255C8" stroke-width="0.5" stroke-dasharray="2 4"/>
+            <line x1="73" y1="92" x2="217" y2="92" stroke="#1255C8" stroke-width="0.5" stroke-dasharray="2 4"/>
+            <!-- D callout -->
+            <line x1="145" y1="27" x2="210" y2="12" stroke="#1B6FE8" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="212" y="12" fill="#4A5B6B" font-family="'IBM Plex Mono',monospace" font-size="9">D = 2</text>
+            <text x="212" y="22" fill="#4A5B6B" font-family="'IBM Plex Mono',monospace" font-size="8">1.5mm wall</text>
+            <text x="30" y="175" fill="#1255C8" font-family="'IBM Plex Mono',monospace" font-size="8">wall thickness visible as gap between circles</text>
           </svg>
         </div>
-        <div class="tc-name">Campana</div>
-        <div class="tc-profile">exhaust</div>
-      </div>
-
-      <div class="toggle-card" data-product="counter">
-        <div class="tc-icon">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="14" width="34" height="20" rx="2"/>
-            <line x1="5" y1="22" x2="39" y2="22"/>
-            <circle cx="14" cy="18" r="2.5"/>
-            <circle cx="22" cy="18" r="2.5"/>
+        <!-- Side: X -->
+        <div class="decomp-view">
+          <div class="decomp-view-label">Side · Expert Flags (X)</div>
+          <svg width="100%" height="190" viewBox="0 0 290 190">
+            <ellipse cx="90" cy="92" rx="18" ry="72" fill="none" stroke="#1255C8" stroke-width="1.5"/>
+            <ellipse cx="200" cy="92" rx="18" ry="72" fill="none" stroke="#1255C8" stroke-width="1.5"/>
+            <line x1="90" y1="20" x2="200" y2="20" stroke="#1255C8" stroke-width="1.5"/>
+            <line x1="90" y1="164" x2="200" y2="164" stroke="#1255C8" stroke-width="1.5"/>
+            <line x1="90" y1="92" x2="200" y2="92" stroke="#C42B2B" stroke-width="2"/>
+            <circle cx="130" cy="48" r="2.5" fill="#C42B2B"/>
+            <circle cx="145" cy="42" r="2.5" fill="#C42B2B"/>
+            <circle cx="160" cy="48" r="2.5" fill="#C42B2B"/>
+            <!-- X callouts -->
+            <line x1="200" y1="92" x2="256" y2="80" stroke="#C42B2B" stroke-width="1" stroke-dasharray="3 2"/>
+            <text x="258" y="80" fill="#C42B2B" font-family="'IBM Plex Mono',monospace" font-size="9">X+1: interior weld</text>
+            <line x1="160" y1="44" x2="256" y2="30" stroke="#C42B2B" stroke-width="1" stroke-dasharray="3 2"/>
+            <text x="258" y="30" fill="#C42B2B" font-family="'IBM Plex Mono',monospace" font-size="9">X+1: mirror polish</text>
+            <text x="52" y="180" fill="#C42B2B" font-family="'IBM Plex Mono',monospace" font-size="9" font-weight="600">X = 2 expert flags active</text>
           </svg>
         </div>
-        <div class="tc-name">Counter</div>
-        <div class="tc-profile">flat-complex</div>
       </div>
-
-      <div class="toggle-card" data-product="fridge">
-        <div class="tc-icon">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#354F6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="10" y="5" width="24" height="34" rx="3"/>
-            <line x1="10" y1="19" x2="34" y2="19"/>
-            <line x1="16" y1="12" x2="16" y2="16"/>
-            <line x1="16" y1="24" x2="16" y2="30"/>
-          </svg>
+      <!-- Score row -->
+      <div class="driver-score-row">
+        <div class="driver-score-cell">
+          <div class="dsc-key">G</div>
+          <div class="dsc-name">Geometry</div>
+          <div class="dsc-val">3</div>
+          <div class="pip-row"><div class="pip on"></div><div class="pip on"></div><div class="pip on"></div><div class="pip"></div><div class="pip"></div></div>
+          <div class="dsc-why">600mm height · Ø480mm<br>large surface area</div>
         </div>
-        <div class="tc-name">Refrigerator</div>
-        <div class="tc-profile">cooling</div>
-      </div>
-
-    </div><!-- end toggle-cards-row -->
-
-    <!-- Breakdown panels -->
-    <div class="breakdown-grid reveal" id="breakdown-grid">
-
-      <!-- Complexity scores -->
-      <div class="breakdown-card">
-        <div class="bc-label">Complexity Drivers</div>
-        <div class="score-row">
-          <span class="score-letter">G</span>
-          <div class="score-track"><div class="score-fill" id="bar-g" style="width:66%"></div></div>
-          <span class="score-val" id="val-g">2</span>
+        <div class="driver-score-cell">
+          <div class="dsc-key">D</div>
+          <div class="dsc-name">Density</div>
+          <div class="dsc-val">2</div>
+          <div class="pip-row"><div class="pip on"></div><div class="pip on"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div>
+          <div class="dsc-why">1.5mm stainless wall<br>standard gauge</div>
         </div>
-        <div class="score-row">
-          <span class="score-letter">D</span>
-          <div class="score-track"><div class="score-fill" id="bar-d" style="width:100%"></div></div>
-          <span class="score-val" id="val-d">3</span>
+        <div class="driver-score-cell">
+          <div class="dsc-key">C</div>
+          <div class="dsc-name">Components</div>
+          <div class="dsc-val">4</div>
+          <div class="pip-row"><div class="pip on"></div><div class="pip on"></div><div class="pip on"></div><div class="pip on"></div><div class="pip"></div></div>
+          <div class="dsc-why">body · lid · inner ring<br>pedal mechanism</div>
         </div>
-        <div class="score-row">
-          <span class="score-letter">C</span>
-          <div class="score-track"><div class="score-fill" id="bar-c" style="width:33%"></div></div>
-          <span class="score-val" id="val-c">1</span>
-        </div>
-        <div class="score-row">
-          <span class="score-letter">X</span>
-          <div class="score-track"><div class="score-fill" id="bar-x" style="width:66%"></div></div>
-          <span class="score-val" id="val-x">2</span>
+        <div class="driver-score-cell">
+          <div class="dsc-key red">X</div>
+          <div class="dsc-name">Expert Flags</div>
+          <div class="dsc-val high">2</div>
+          <div class="pip-row"><div class="pip on red"></div><div class="pip on red"></div></div>
+          <div class="dsc-why">interior weld<br>mirror polish finish</div>
         </div>
       </div>
+      <div class="tier-result-row">
+        <span>tier_result =</span>
+        <span class="tier tier-c4">C4</span>
+        <span>f(G=3, D=2, C=4, X=2) → advanced complexity · senior operator required</span>
+      </div>
+    </div>
+  </div>
+</div>
 
-      <!-- Process profile -->
-      <div class="breakdown-card">
-        <div class="bc-label">Process Profile</div>
-        <div id="process-list">
-          <!-- populated by JS -->
+<!-- S5: ELEVEN PROCESSES (on mat) -->
+<div id="selector"></div>
+<div class="table-surface">
+  <div class="blueprint-mat">
+    <div class="mat-header">
+      <div>
+        <div class="sys-label" style="margin-bottom:8px;">S.05 · Eleven Processes, Five Tiers Each</div>
+        <div class="mat-section-title">The cost <em>engine</em></div>
+        <div class="mat-sub">select a product profile → driver scores → active processes → real cost</div>
+      </div>
+      <div class="mat-section-num">05</div>
+    </div>
+    <div class="mat-pad" style="padding-top:24px;">
+
+      <!-- TIER LEGEND -->
+      <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;align-items:center;">
+        <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-right:4px;">Complexity tiers:</span>
+        <span class="tier tier-c1">C1</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Standard</span>
+        <span class="tier tier-c2">C2</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Elevated</span>
+        <span class="tier tier-c3">C3</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Complex</span>
+        <span class="tier tier-c4">C4</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Advanced</span>
+        <span class="tier tier-c5">C5</span><span style="font-family:var(--mono);font-size:10px;color:var(--red);">Expert</span>
+      </div>
+
+      <!-- PRODUCT TABS -->
+      <div class="product-tabs" id="product-tabs">
+        <div class="product-tab active" data-product="bin">
+          <div class="product-tab-icon">
+            <svg width="28" height="30" viewBox="0 0 28 30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><ellipse cx="14" cy="5" rx="11" ry="3.5"/><ellipse cx="14" cy="25" rx="11" ry="3.5"/><line x1="3" y1="5" x2="3" y2="25"/><line x1="25" y1="5" x2="25" y2="25"/><ellipse cx="14" cy="13" rx="11" ry="3.5" stroke-dasharray="2 2" stroke-width="0.75"/></svg>
+          </div>CYLINDRICAL BIN
+        </div>
+        <div class="product-tab" data-product="shelf">
+          <div class="product-tab-icon">
+            <svg width="32" height="22" viewBox="0 0 32 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="5" width="30" height="5" rx="0"/><line x1="4" y1="10" x2="4" y2="20"/><line x1="28" y1="10" x2="28" y2="20"/><line x1="1" y1="5" x2="5" y2="1"/><line x1="31" y1="5" x2="27" y2="1"/></svg>
+          </div>WALL SHELF
+        </div>
+        <div class="product-tab" data-product="campana">
+          <div class="product-tab-icon">
+            <svg width="30" height="28" viewBox="0 0 30 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M15 2 L28 20 H2 Z"/><rect x="10" y="20" width="10" height="6" rx="0"/><line x1="4" y1="13" x2="26" y2="13" stroke-dasharray="2 2" stroke-width="0.75"/></svg>
+          </div>CAMPANA
+        </div>
+        <div class="product-tab" data-product="counter">
+          <div class="product-tab-icon">
+            <svg width="34" height="24" viewBox="0 0 34 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="4" width="32" height="7" rx="0"/><line x1="6" y1="11" x2="6" y2="22"/><line x1="28" y1="11" x2="28" y2="22"/><line x1="1" y1="11" x2="33" y2="11"/></svg>
+          </div>COUNTER TOP
+        </div>
+        <div class="product-tab" data-product="fridge">
+          <div class="product-tab-icon">
+            <svg width="26" height="32" viewBox="0 0 26 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="1" width="22" height="30" rx="0"/><line x1="2" y1="14" x2="24" y2="14"/><circle cx="20" cy="8" r="2"/><circle cx="20" cy="22" r="2"/></svg>
+          </div>REFRIGERATOR
         </div>
       </div>
 
-      <!-- Cost output -->
-      <div class="breakdown-card">
-        <div class="bc-label">Cost Output</div>
-        <div class="cost-total" id="cost-total">$48,200</div>
-        <div class="cost-currency">CLP · direct cost</div>
-        <div id="cost-lines">
-          <!-- populated by JS -->
+      <!-- PRODUCT PANEL -->
+      <div class="product-panel" id="product-panel">
+        <div class="panel-col">
+          <div class="panel-label">Driver Scores</div>
+          <div class="score-row"><span class="score-key">G</span><div class="score-bar"><div class="score-fill" id="fill-g" style="width:60%;"></div></div><span class="score-val" id="val-g">3</span></div>
+          <div class="score-row"><span class="score-key">D</span><div class="score-bar"><div class="score-fill" id="fill-d" style="width:40%;"></div></div><span class="score-val" id="val-d">2</span></div>
+          <div class="score-row"><span class="score-key">C</span><div class="score-bar"><div class="score-fill" id="fill-c" style="width:80%;"></div></div><span class="score-val" id="val-c">4</span></div>
+          <div class="score-row"><span class="score-key red">X</span><div class="score-bar"><div class="score-fill high" id="fill-x" style="width:100%;"></div></div><span class="score-val" id="val-x" style="color:var(--red);">2</span></div>
+          <div class="tier-display">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">tier →</span>
+            <span class="tier" id="tier-badge">C4</span>
+          </div>
         </div>
-        <div class="cost-factor-badge" id="cost-factor">Factor would price: $28,000</div>
+        <div class="panel-col">
+          <div class="panel-label">Active Processes</div>
+          <div class="proc-list" id="proc-list">
+            <!-- filled by JS -->
+          </div>
+        </div>
+        <div class="panel-col">
+          <div class="panel-label">Cost Breakdown</div>
+          <div class="cost-total" id="cost-total">$48,400</div>
+          <div class="cost-currency">CLP · ex-material · direct labor + consumables</div>
+          <div class="cost-lines" id="cost-lines"><!-- filled by JS --></div>
+          <div class="cost-delta" id="cost-delta"></div>
+        </div>
       </div>
 
     </div>
   </div>
-</section>
+</div>
 
 <!-- S6: KNOWLEDGE PROBLEM -->
-<section class="story" id="s6">
+<section class="story" id="knowledge">
   <div class="wrap">
-    <div class="section-label reveal">Section 06</div>
-    <div class="section-num reveal">06</div>
-    <h2 class="section-title reveal">The Knowledge Problem</h2>
-    <p class="section-deck reveal">The hardest part of the project had nothing to do with data or models.</p>
-    <div class="prose">
-      <p class="reveal">Hernán has worked at Dulox for over thirty years. He knows, intuitively, how long every process takes. He knows which products are going to be trouble before they're even started. This knowledge is real, accurate, and completely informal. It exists only in his head.</p>
-      <p class="reveal">The first sessions were hard. He'd say "that takes about 40 minutes" and when you asked "for what size piece?" he'd think for a second and say "well, it depends." The job was to make the <em>it depends</em> explicit.</p>
+    <div class="story-num reveal">S.06 · The Knowledge Problem</div>
+    <h2 class="reveal d1">It Lives in One Person's Head</h2>
+    <p class="deck reveal d2">The production manager has been working at Dulox for over 30 years. The real challenge wasn't building the model. It was extracting the knowledge to feed it.</p>
+
+    <div class="pullquote reveal">
+      "Hernán knows, intuitively, how long every process takes. He knows which products are going to be trouble before they're even started. He knows which operators can handle which complexity. This knowledge is real, it's accurate, and it is completely informal."
     </div>
-    <div class="callout reveal">
-      Formalization changes things. When you ask an expert to articulate their knowledge, they often realize they don't know it as precisely as they thought. The process of articulation creates new clarity — and reveals new uncertainty. <strong>The expert feels exposed.</strong>
+
+    <div class="prose">
+      <p class="reveal">You can't just interview him once. The knowledge is contextual, process-specific, and changes as machines change, operators learn, and new product types appear. The first sessions were hard. He would say "that takes about 40 minutes" and when you asked "for what size piece?" he'd think for a second and say "well, it depends." The job was to make the "it depends" explicit.</p>
+      <p class="reveal">We ran calibration sessions with a chronometer — timing actual production of anchor products that cover the widest range of processes and complexity. Seven products. Every active process. Every complexity tier we could get into that run. The time estimates in the model are not theoretical. They are measured.</p>
+    </div>
+
+    <div class="callout-block reveal">
+      Formalization changes things. When you ask an expert to articulate their knowledge, they often realize they don't know it as precisely as they thought. The process of articulation creates new clarity — and reveals new uncertainty. This is uncomfortable. The expert feels exposed. The interviewer has to be careful not to undermine the trust that makes the extraction possible.
     </div>
   </div>
 </section>
 
-<!-- S7: INGESTION LOOP + VIDEO -->
-<section class="video-section" id="s7">
+<!-- S7: INGESTION LOOP -->
+<section class="story" id="s7">
   <div class="wrap">
-    <div class="section-label reveal">Section 07</div>
-    <div class="section-num reveal">07</div>
-    <h2 class="section-title reveal">Intercepting the Existing Workflow</h2>
-    <p class="section-deck reveal">Don't change the workflow. Find the existing artifact that already captures what you need.</p>
-
-    <div class="prose" style="margin-bottom:36px;">
-      <p class="reveal">When a production order arrives, Hernán draws a sketch. He's always drawn sketches. The sketch contains dimensions, material specs, process indications, complexity flags, special notes. Everything the model needs. We didn't ask him to learn software. We asked him to keep doing exactly what he already does — and built the system around his native output.</p>
+    <div class="story-num reveal">S.07 · Intercepting the Workflow</div>
+    <h2 class="reveal d1">Don't Change Behavior. Intercept It.</h2>
+    <p class="deck reveal d2">The failure mode of most digitization projects: you ask people to do new things. We didn't.</p>
+    <div class="prose">
+      <p class="reveal">When a production order arrives, Hernán draws a sketch. He's always drawn sketches. The sketch goes to each operator with annotations — dimensions, material specifications, process indications, special notes. It's his primary communication tool and it contains everything we need: dimensions, material, process flags, complexity indicators.</p>
     </div>
 
-    <div class="video-layout reveal">
-      <!-- Main player -->
-      <div class="video-main-wrap">
-        <div class="video-screen">
-          <div class="video-tag">SKETCH → JSON · 0:52</div>
-          <div class="video-placeholder">factory video<br>drops here</div>
-          <div class="video-play-overlay">
-            <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
-              <path d="M2 1.5l10 6.5-10 6.5V1.5z" fill="#1C1917"/>
-            </svg>
-          </div>
+    <div class="ingestion-flow reveal" style="margin: 40px 0; max-width:760px;">
+      <div class="ing-step">
+        <div class="ing-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="2" width="20" height="24" rx="0"/><line x1="8" y1="8" x2="20" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="18" y2="16"/></svg>
         </div>
-        <div class="video-bar-wrap">
-          <div class="video-progress-track">
-            <div class="video-progress-fill"></div>
-          </div>
-          <div class="video-controls-row">
-            <div class="vbtn vbtn-play">
-              <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-                <path d="M1.5 1l7 5-7 5V1z" fill="white"/>
-              </svg>
-            </div>
-            <span class="video-time">0:19 / 0:52</span>
-            <div class="video-nav-arrows">
-              <div class="vbtn">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                  <path d="M8 2L4 6l4 4"/>
-                </svg>
-              </div>
-              <div class="vbtn">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                  <path d="M4 2l4 4-4 4"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="video-title">Sketch → JSON — the ingestion loop</div>
-        <div class="video-caption">Hernán draws his sketch. Phone camera captures it. Vision model extracts dimensions, material spec, component count, and expert flags. Outputs structured JSON that feeds directly into the cost engine. His friction is zero.</div>
+        <div class="ing-label">Artifact</div>
+        <div class="ing-name">Hernán's sketch</div>
       </div>
+      <div class="ing-arrow">
+        <svg width="32" height="12" viewBox="0 0 32 12"><line x1="0" y1="6" x2="24" y2="6" stroke="#1255C8" stroke-width="1.5"/><polygon points="24,3 32,6 24,9" fill="#1255C8"/></svg>
+      </div>
+      <div class="ing-step">
+        <div class="ing-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="8" y="2" width="12" height="8" rx="1"/><path d="M2 10h24v14a2 2 0 01-2 2H4a2 2 0 01-2-2z"/><circle cx="14" cy="17" r="4"/><circle cx="14" cy="17" r="1.5" fill="currentColor"/></svg>
+        </div>
+        <div class="ing-label">Capture</div>
+        <div class="ing-name">Phone photo</div>
+      </div>
+      <div class="ing-arrow">
+        <svg width="32" height="12" viewBox="0 0 32 12"><line x1="0" y1="6" x2="24" y2="6" stroke="#1255C8" stroke-width="1.5"/><polygon points="24,3 32,6 24,9" fill="#1255C8"/></svg>
+      </div>
+      <div class="ing-step">
+        <div class="ing-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="6" width="24" height="16" rx="1"/><circle cx="14" cy="14" r="4"/><path d="M8 6V4M20 6V4M14 6V4"/></svg>
+        </div>
+        <div class="ing-label">Process</div>
+        <div class="ing-name">Vision model</div>
+      </div>
+      <div class="ing-arrow">
+        <svg width="32" height="12" viewBox="0 0 32 12"><line x1="0" y1="6" x2="24" y2="6" stroke="#1255C8" stroke-width="1.5"/><polygon points="24,3 32,6 24,9" fill="#1255C8"/></svg>
+      </div>
+      <div class="ing-step">
+        <div class="ing-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="24" height="20" rx="1"/><line x1="6" y1="10" x2="22" y2="10"/><line x1="6" y1="14" x2="16" y2="14"/><line x1="6" y1="18" x2="18" y2="18"/></svg>
+        </div>
+        <div class="ing-label">Extract</div>
+        <div class="ing-name">Structured JSON</div>
+      </div>
+      <div class="ing-arrow">
+        <svg width="32" height="12" viewBox="0 0 32 12"><line x1="0" y1="6" x2="24" y2="6" stroke="#1255C8" stroke-width="1.5"/><polygon points="24,3 32,6 24,9" fill="#1255C8"/></svg>
+      </div>
+      <div class="ing-step">
+        <div class="ing-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="14" cy="14" r="11"/><path d="M10 14l3 3 5-6"/></svg>
+        </div>
+        <div class="ing-label">Output</div>
+        <div class="ing-name">Real cost</div>
+      </div>
+    </div>
 
-      <!-- Thumbnail sidebar -->
-      <div class="video-thumbs">
-        <div class="vthumb active">
-          <div class="vthumb-img">✏️</div>
-          <div>
-            <div class="vthumb-title">Sketch → JSON</div>
-            <div class="vthumb-dur">0:52</div>
-          </div>
-        </div>
-        <div class="vthumb">
-          <div class="vthumb-img" style="font-size:16px;">⚙️</div>
-          <div>
-            <div class="vthumb-title">Soldadura C3</div>
-            <div class="vthumb-dur">2:14</div>
-          </div>
-        </div>
-        <div class="vthumb">
-          <div class="vthumb-img" style="font-size:16px;">✂️</div>
-          <div>
-            <div class="vthumb-title">Corte Láser C2</div>
-            <div class="vthumb-dur">1:08</div>
-          </div>
-        </div>
-        <div class="vthumb">
-          <div class="vthumb-img" style="font-size:16px;">🔄</div>
-          <div>
-            <div class="vthumb-title">Cilindrado C3</div>
-            <div class="vthumb-dur">3:21</div>
-          </div>
-        </div>
-        <div class="vthumb">
-          <div class="vthumb-img" style="font-size:16px;">✨</div>
-          <div>
-            <div class="vthumb-title">Pulido C2 → C3</div>
-            <div class="vthumb-dur">1:55</div>
-          </div>
-        </div>
-      </div>
+    <div class="prose">
+      <p class="reveal">We didn't ask Hernán to learn software. We didn't ask him to fill forms. We asked him to keep doing exactly what he already does — draw his sketch — and we built the computer system around his native output. His friction is zero. The system's data is rich.</p>
+      <p class="reveal">The production manager reviews and confirms each extraction. When the model is wrong, he corrects it. The correction teaches the model. Hernán becomes more consistent because he has to articulate the exception. This is a feedback loop between human expertise and machine structure.</p>
     </div>
   </div>
 </section>
@@ -955,70 +1029,157 @@
 <!-- S8: PHILOSOPHY -->
 <section class="story" id="s8">
   <div class="wrap">
-    <div class="section-label reveal">Section 08</div>
-    <div class="section-num reveal">08</div>
-    <h2 class="section-title reveal">Augmentation, Not Replacement</h2>
-    <p class="section-deck reveal">The easy version of this story is "we used AI to price products." That misses the point entirely.</p>
-    <div class="prose">
-      <p class="reveal">Hernán is not being replaced. He is being equipped with a mirror — a system that reflects his own knowledge back to him in a form that can be shared, challenged, updated, and improved. When the model is wrong, Hernán corrects it. The correction teaches the model. Hernán becomes more consistent because he has to articulate the exception.</p>
+    <div class="story-num reveal">S.08 · The Philosophy</div>
+    <h2 class="reveal d1">Augmentation, Not Replacement</h2>
+    <p class="deck reveal d2">The easy version of this story is: "we used AI to price products." That misses the point entirely.</p>
+
+    <div class="pullquote reveal">
+      "The production manager is not being replaced. He is being equipped with a mirror — a system that reflects his own knowledge back to him in a form that can be shared, challenged, updated, and improved."
     </div>
-    <div class="dark-box reveal">
-      <div class="db-label">The deeper claim</div>
-      <p>The most valuable application of AI in manufacturing is not automation of tasks. It's the formalization of expertise. The 30-year veteran who retires takes his knowledge with him. If you've built the system, the knowledge stays.</p>
+
+    <div class="prose">
+      <p class="reveal">The AI (vision model, classification model) is not the innovation. The innovation is the epistemological work: making the implicit explicit, structuring what was intuitive, building a system that can hold and communicate expert knowledge consistently across time and people.</p>
+      <p class="reveal">The most valuable application of AI in manufacturing is not automation of tasks. It's the formalization of expertise. The 30-year veteran who retires takes his knowledge with him. If you've built the system, the knowledge stays.</p>
+    </div>
+
+    <div class="insight-box reveal">
+      <div class="insight-label">The honest caveat</div>
+      <p>This is hard. It takes longer than you expect. The expert has to trust you. The organization has to commit to maintaining the model. The data quality depends on human diligence. There is no version of this that runs itself.</p>
     </div>
   </div>
 </section>
 
-<!-- RESULTS: BAR CHART -->
-<section class="results-section dot-grid" id="results">
-  <div class="wrap">
-    <div class="section-label reveal">Results</div>
-    <div class="section-num reveal" style="color:var(--border);">—</div>
-    <h2 class="section-title reveal">What Changes When You Can Actually See</h2>
-
-    <div class="chart-setup reveal">
-      <p>The factor method systematically underpriced the most complex products — cylindrical profiles and refrigeration units were losing margin on every order. The cost model makes these gaps visible for the first time.</p>
+<!-- RESULTS (on mat) -->
+<div id="results"></div>
+<div class="table-surface">
+  <div class="blueprint-mat">
+    <div class="mat-header">
+      <div>
+        <div class="sys-label" style="margin-bottom:8px;">Results</div>
+        <div class="mat-section-title">What changes when you can actually <em>see</em></div>
+        <div class="mat-sub">model cost vs. factor cost · first measurement after 30 years</div>
+      </div>
+      <div class="mat-section-num" style="font-size:48px;">res</div>
     </div>
+    <div class="mat-pad">
+      <div class="results-intro">
+        <p>The model produces cost estimates per product category for the first time in the factory's history. The delta between model cost and factor cost reveals systematic mispricing — products that were being sold at a loss, and products with substantial untapped margin.</p>
+      </div>
 
-    <!-- Chart -->
-    <div style="position:relative; padding-top: 28px; max-width: 780px;" class="reveal">
+      <!-- Bar chart: before vs after -->
+      <div class="section-rule"><span class="rule-label">Estimated cost delta by product profile (model cost − factor cost)</span></div>
       <div class="chart-area">
         <div class="chart-group">
-          <div class="bar bar-before" style="height:162px;"><span class="bar-pct">−31%</span></div>
-          <div class="bar bar-after"  style="height:20px;"><span class="bar-pct">−4%</span></div>
+          <div class="bar bar-before" style="height:42%"><span class="bar-pct">factor</span></div>
+          <div class="bar bar-after"  style="height:72%"><span class="bar-pct">model</span></div>
         </div>
         <div class="chart-group">
-          <div class="bar bar-before" style="height:57px;"><span class="bar-pct">−12%</span></div>
-          <div class="bar bar-after"  style="height:10px;"><span class="bar-pct">−2%</span></div>
+          <div class="bar bar-before" style="height:42%"><span class="bar-pct">factor</span></div>
+          <div class="bar bar-after"  style="height:38%"><span class="bar-pct">model</span></div>
         </div>
         <div class="chart-group">
-          <div class="bar bar-before" style="height:110px;"><span class="bar-pct">−22%</span></div>
-          <div class="bar bar-after"  style="height:14px;"><span class="bar-pct">−3%</span></div>
+          <div class="bar bar-before" style="height:42%"><span class="bar-pct">factor</span></div>
+          <div class="bar bar-after"  style="height:88%"><span class="bar-pct">model</span></div>
         </div>
         <div class="chart-group">
-          <div class="bar bar-before" style="height:178px;"><span class="bar-pct">−38%</span></div>
-          <div class="bar bar-after"  style="height:24px;"><span class="bar-pct">−5%</span></div>
+          <div class="bar bar-before" style="height:42%"><span class="bar-pct">factor</span></div>
+          <div class="bar bar-after"  style="height:52%"><span class="bar-pct">model</span></div>
         </div>
         <div class="chart-group">
-          <div class="bar bar-before" style="height:38px;"><span class="bar-pct">−8%</span></div>
-          <div class="bar bar-after"  style="height:5px;"><span class="bar-pct">−1%</span></div>
+          <div class="bar bar-before" style="height:42%"><span class="bar-pct">factor</span></div>
+          <div class="bar bar-after"  style="height:100%"><span class="bar-pct">model</span></div>
+        </div>
+        <div class="chart-group">
+          <div class="bar bar-before" style="height:42%"><span class="bar-pct">factor</span></div>
+          <div class="bar bar-after"  style="height:29%"><span class="bar-pct">model</span></div>
         </div>
       </div>
-      <div class="chart-x">
-        <div class="chart-x-lbl">Cylindrical</div>
-        <div class="chart-x-lbl">Flat Panel</div>
-        <div class="chart-x-lbl">Campana</div>
-        <div class="chart-x-lbl">Refrigeration</div>
-        <div class="chart-x-lbl">Counter</div>
+      <div class="chart-xlabels">
+        <div class="chart-xlabel">Cylindrical<br>bin</div>
+        <div class="chart-xlabel">Wall<br>shelf</div>
+        <div class="chart-xlabel">Campana<br>C5</div>
+        <div class="chart-xlabel">Counter<br>plain</div>
+        <div class="chart-xlabel">Counter<br>refrig.</div>
+        <div class="chart-xlabel">Panel<br>simple</div>
       </div>
       <div class="chart-legend">
-        <div class="legend-item">
-          <div class="legend-dot" style="background:var(--surface2);border:1px solid var(--border);"></div>
-          Factor method — deviation from actual cost
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(176,196,220,0.6);border:1px solid var(--border);"></div>Factor estimate (uniform)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--blue);"></div>Model estimate (decomposed)</div>
+      </div>
+
+      <!-- Delta summary cards -->
+      <div class="delta-cards">
+        <div class="delta-card">
+          <div class="delta-cat">Complex products (C4–C5)</div>
+          <div class="delta-val positive">+38–62%</div>
+          <div class="delta-desc">Systematically underpriced by the factor. Interior welds, mirror polish, and multi-component assembly were not captured.</div>
         </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:var(--accent);"></div>
-          Cost model — deviation from actual cost
+        <div class="delta-card">
+          <div class="delta-cat">Simple products (C1–C2)</div>
+          <div class="delta-val negative">−18–28%</div>
+          <div class="delta-desc">Overpriced vs. real cost. Simple panel products subsidized complex orders for 30 years without anyone knowing.</div>
+        </div>
+        <div class="delta-card">
+          <div class="delta-cat">Margin visibility</div>
+          <div class="delta-val positive">First time</div>
+          <div class="delta-desc">Salespeople can now quote with confidence and explain why. The company can identify which categories to expand and which to reprice.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEOS -->
+<section class="video-section">
+  <div class="wrap">
+    <div class="story-num reveal">Documentation</div>
+    <h2 class="reveal d1" style="font-size:clamp(22px,3vw,34px);font-weight:700;letter-spacing:-0.02em;margin-bottom:8px;">Process in practice</h2>
+    <p class="reveal d2" style="font-size:16px;color:var(--muted);max-width:560px;line-height:1.7;margin-bottom:36px;">Recorded sessions from the calibration runs and the ingestion loop in production.</p>
+
+    <div class="video-layout reveal">
+      <div>
+        <div class="video-screen">
+          <div class="video-placeholder">
+            VIDEO<br>Calibration session<br>Hernán · soldadura · C4
+          </div>
+          <div class="video-tag">Calibration Run · 2025</div>
+        </div>
+        <div class="video-controls">
+          <div class="video-track"><div class="video-fill"></div></div>
+          <div class="video-ctrl-row">
+            <div class="vbtn">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 2v8l8-4z"/></svg>
+            </div>
+            <span class="vtime">0:00 / 4:18</span>
+            <div class="video-nav">
+              <div class="vbtn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2L4 6l5 4"/></svg></div>
+              <div class="vbtn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2l5 4-5 4"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="video-title">Calibration Session — Soldadura C4</div>
+        <p class="video-caption">Hernán walks through the weld sequence on a cylindrical bin with interior welds. This is the session that defined the C4 tier for soldadura — including the "interior" expert flag that adds +40% to estimated time.</p>
+      </div>
+      <div class="video-thumbs">
+        <div class="vthumb active">
+          <div class="vthumb-img"><svg width="18" height="18" viewBox="0 0 18 18" fill="rgba(255,255,255,0.3)"><path d="M4 3v12l10-6z"/></svg></div>
+          <div><div class="vthumb-title">Calibration — Soldadura C4</div><div class="vthumb-dur">4:18</div></div>
+        </div>
+        <div class="vthumb">
+          <div class="vthumb-img"><svg width="18" height="18" viewBox="0 0 18 18" fill="rgba(255,255,255,0.3)"><path d="M4 3v12l10-6z"/></svg></div>
+          <div><div class="vthumb-title">Ingestion — Sketch to JSON</div><div class="vthumb-dur">2:44</div></div>
+        </div>
+        <div class="vthumb">
+          <div class="vthumb-img"><svg width="18" height="18" viewBox="0 0 18 18" fill="rgba(255,255,255,0.3)"><path d="M4 3v12l10-6z"/></svg></div>
+          <div><div class="vthumb-title">Expert Interview — Cilindrado</div><div class="vthumb-dur">8:02</div></div>
+        </div>
+        <div class="vthumb">
+          <div class="vthumb-img"><svg width="18" height="18" viewBox="0 0 18 18" fill="rgba(255,255,255,0.3)"><path d="M4 3v12l10-6z"/></svg></div>
+          <div><div class="vthumb-title">Calibration — Pulido Mirror C5</div><div class="vthumb-dur">3:55</div></div>
+        </div>
+        <div class="vthumb">
+          <div class="vthumb-img"><svg width="18" height="18" viewBox="0 0 18 18" fill="rgba(255,255,255,0.3)"><path d="M4 3v12l10-6z"/></svg></div>
+          <div><div class="vthumb-title">Live Quoting Demo</div><div class="vthumb-dur">5:30</div></div>
         </div>
       </div>
     </div>
@@ -1026,189 +1187,169 @@
 </section>
 
 <!-- CLOSING -->
-<section class="closing" id="closing">
+<section class="closing">
   <div class="wrap">
     <blockquote class="reveal">
-      The factory didn't change. The machines are the same. The operators are the same. Hernán still draws his sketches every morning. What changed is that now, when the sketch is done, the number is right.
+      "The factory didn't change. The machines are the same. The operators are the same. Hernán still draws his sketches every morning. What changed is that now, when the sketch is done, the number is right."
     </blockquote>
-    <cite class="reveal">Fabio Fuentes · Manufacturing Cost Model · 2025</cite>
+    <cite class="reveal d1">Fabio Fuentes · Manufacturing Cost Model · 2025</cite>
   </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
   <div class="wrap">
-    <span>Fabio Fuentes · <a href="../">fafa341.github.io</a></span>
-    <span>Manufacturing Cost Model · 2025</span>
+    <a href="../">← Fabio Fuentes</a>
+    <span style="font-family:var(--mono);font-size:11px;color:var(--dim);">Manufacturing Cost Model · 2025 · Work in progress</span>
   </div>
 </footer>
 
 <script>
-// Progress bar
+// ── PROGRESS BAR ──
+const progressEl = document.getElementById('progress');
 window.addEventListener('scroll', () => {
-  const d = document.documentElement;
-  document.getElementById('progress').style.width =
-    (window.scrollY / (d.scrollHeight - d.clientHeight) * 100) + '%';
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  progressEl.style.width = (pct * 100) + '%';
 });
 
-// Scroll reveal
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
-}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); observer.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// Product data
+// ── PRODUCT DATA ──
 const products = {
   bin: {
-    g: 2, d: 3, c: 1, x: 2,
+    G: 3, D: 2, C: 4, X: 2, tier: 'C4',
     processes: [
-      { name: 'Trazado',      tier: 'c2', active: true },
-      { name: 'Corte Manual', tier: 'c2', active: true },
-      { name: 'Corte Laser',  tier: 'off', active: false },
-      { name: 'Cilindrado',   tier: 'c3', active: true },
-      { name: 'Soldadura',    tier: 'c3', active: true },
-      { name: 'Pulido',       tier: 'c2', active: true },
-      { name: 'QC',           tier: 'c1', active: true },
+      { name: 'trazado',     tier: 'C2', active: true,  cost: 2100 },
+      { name: 'corte laser', tier: 'C3', active: true,  cost: 8400 },
+      { name: 'cilindrado',  tier: 'C4', active: true,  cost: 12600 },
+      { name: 'plegado',     tier: null, active: false, cost: 0 },
+      { name: 'soldadura',   tier: 'C5', active: true,  cost: 14800 },
+      { name: 'pulido',      tier: 'C4', active: true,  cost: 8200 },
+      { name: 'grabado',     tier: null, active: false, cost: 0 },
+      { name: 'pintura',     tier: null, active: false, cost: 0 },
+      { name: 'refriger.',   tier: null, active: false, cost: 0 },
+      { name: 'QC',          tier: 'C2', active: true,  cost: 2300 },
     ],
-    total: '$48,200',
-    lines: [
-      { name: 'Materials',     val: '$18,500' },
-      { name: 'Direct Labor',  val: '$21,400' },
-      { name: 'Consumables',   val: '$4,800' },
-      { name: 'Machine Time',  val: '$3,500' },
-    ],
-    factor: 'Factor would price: $28,000',
+    factorCost: 31200,
   },
   shelf: {
-    g: 1, d: 1, c: 1, x: 1,
+    G: 2, D: 1, C: 2, X: 0, tier: 'C1',
     processes: [
-      { name: 'Trazado',      tier: 'c1', active: true },
-      { name: 'Corte Manual', tier: 'c1', active: true },
-      { name: 'Corte Laser',  tier: 'off', active: false },
-      { name: 'Plegado',      tier: 'c1', active: true },
-      { name: 'Soldadura',    tier: 'c1', active: true },
-      { name: 'Pulido',       tier: 'off', active: false },
-      { name: 'QC',           tier: 'c1', active: true },
+      { name: 'trazado',     tier: 'C1', active: true,  cost: 900 },
+      { name: 'corte laser', tier: 'C1', active: true,  cost: 2800 },
+      { name: 'cilindrado',  tier: null, active: false, cost: 0 },
+      { name: 'plegado',     tier: 'C2', active: true,  cost: 2400 },
+      { name: 'soldadura',   tier: 'C2', active: true,  cost: 3600 },
+      { name: 'pulido',      tier: 'C1', active: true,  cost: 1800 },
+      { name: 'grabado',     tier: null, active: false, cost: 0 },
+      { name: 'pintura',     tier: null, active: false, cost: 0 },
+      { name: 'refriger.',   tier: null, active: false, cost: 0 },
+      { name: 'QC',          tier: 'C1', active: true,  cost: 800 },
     ],
-    total: '$14,800',
-    lines: [
-      { name: 'Materials',     val: '$7,200' },
-      { name: 'Direct Labor',  val: '$5,600' },
-      { name: 'Consumables',   val: '$1,200' },
-      { name: 'Machine Time',  val: '$800' },
-    ],
-    factor: 'Factor would price: $13,500',
+    factorCost: 18400,
   },
   campana: {
-    g: 2, d: 2, c: 2, x: 2,
+    G: 2, D: 1, C: 3, X: 1, tier: 'C3',
     processes: [
-      { name: 'Trazado',      tier: 'c2', active: true },
-      { name: 'Corte Manual', tier: 'c2', active: true },
-      { name: 'Corte Laser',  tier: 'c1', active: true },
-      { name: 'Plegado',      tier: 'c2', active: true },
-      { name: 'Soldadura',    tier: 'c2', active: true },
-      { name: 'Pulido',       tier: 'c1', active: true },
-      { name: 'QC',           tier: 'c1', active: true },
+      { name: 'trazado',     tier: 'C2', active: true,  cost: 1200 },
+      { name: 'corte laser', tier: 'C2', active: true,  cost: 4800 },
+      { name: 'cilindrado',  tier: null, active: false, cost: 0 },
+      { name: 'plegado',     tier: 'C3', active: true,  cost: 5400 },
+      { name: 'soldadura',   tier: 'C3', active: true,  cost: 9200 },
+      { name: 'pulido',      tier: 'C3', active: true,  cost: 6100 },
+      { name: 'grabado',     tier: null, active: false, cost: 0 },
+      { name: 'pintura',     tier: null, active: false, cost: 0 },
+      { name: 'refriger.',   tier: null, active: false, cost: 0 },
+      { name: 'QC',          tier: 'C2', active: true,  cost: 1400 },
     ],
-    total: '$32,600',
-    lines: [
-      { name: 'Materials',     val: '$12,400' },
-      { name: 'Direct Labor',  val: '$14,200' },
-      { name: 'Consumables',   val: '$3,600' },
-      { name: 'Machine Time',  val: '$2,400' },
-    ],
-    factor: 'Factor would price: $25,000',
+    factorCost: 22000,
   },
   counter: {
-    g: 3, d: 2, c: 3, x: 1,
+    G: 3, D: 2, C: 3, X: 1, tier: 'C3',
     processes: [
-      { name: 'Trazado',      tier: 'c3', active: true },
-      { name: 'Corte Manual', tier: 'c2', active: true },
-      { name: 'Corte Laser',  tier: 'c2', active: true },
-      { name: 'Plegado',      tier: 'c3', active: true },
-      { name: 'Soldadura',    tier: 'c2', active: true },
-      { name: 'Pulido',       tier: 'c1', active: true },
-      { name: 'QC',           tier: 'c2', active: true },
+      { name: 'trazado',     tier: 'C2', active: true,  cost: 1600 },
+      { name: 'corte laser', tier: 'C3', active: true,  cost: 7200 },
+      { name: 'cilindrado',  tier: null, active: false, cost: 0 },
+      { name: 'plegado',     tier: 'C3', active: true,  cost: 6800 },
+      { name: 'soldadura',   tier: 'C3', active: true,  cost: 10400 },
+      { name: 'pulido',      tier: 'C2', active: true,  cost: 4800 },
+      { name: 'grabado',     tier: null, active: false, cost: 0 },
+      { name: 'pintura',     tier: null, active: false, cost: 0 },
+      { name: 'refriger.',   tier: null, active: false, cost: 0 },
+      { name: 'QC',          tier: 'C2', active: true,  cost: 1800 },
     ],
-    total: '$67,400',
-    lines: [
-      { name: 'Materials',     val: '$28,800' },
-      { name: 'Direct Labor',  val: '$28,600' },
-      { name: 'Consumables',   val: '$5,800' },
-      { name: 'Machine Time',  val: '$4,200' },
-    ],
-    factor: 'Factor would price: $51,000',
+    factorCost: 26400,
   },
   fridge: {
-    g: 3, d: 2, c: 3, x: 3,
+    G: 3, D: 2, C: 5, X: 2, tier: 'C5',
     processes: [
-      { name: 'Trazado',        tier: 'c3', active: true },
-      { name: 'Corte Laser',    tier: 'c2', active: true },
-      { name: 'Plegado',        tier: 'c3', active: true },
-      { name: 'Soldadura',      tier: 'c3', active: true },
-      { name: 'Refrigeracion',  tier: 'c3', active: true },
-      { name: 'Pintura',        tier: 'c2', active: true },
-      { name: 'QC',             tier: 'c3', active: true },
+      { name: 'trazado',     tier: 'C3', active: true,  cost: 2400 },
+      { name: 'corte laser', tier: 'C3', active: true,  cost: 8800 },
+      { name: 'cilindrado',  tier: null, active: false, cost: 0 },
+      { name: 'plegado',     tier: 'C4', active: true,  cost: 9600 },
+      { name: 'soldadura',   tier: 'C5', active: true,  cost: 18400 },
+      { name: 'pulido',      tier: 'C3', active: true,  cost: 5600 },
+      { name: 'grabado',     tier: null, active: false, cost: 0 },
+      { name: 'pintura',     tier: null, active: false, cost: 0 },
+      { name: 'refriger.',   tier: 'C4', active: true,  cost: 14200 },
+      { name: 'QC',          tier: 'C3', active: true,  cost: 3200 },
     ],
-    total: '$124,500',
-    lines: [
-      { name: 'Materials',      val: '$48,200' },
-      { name: 'Direct Labor',   val: '$52,300' },
-      { name: 'Consumables',    val: '$14,600' },
-      { name: 'Machine Time',   val: '$9,400' },
-    ],
-    factor: 'Factor would price: $76,000',
+    factorCost: 38000,
   },
 };
+
+const tierClasses = { C1:'tier-c1', C2:'tier-c2', C3:'tier-c3', C4:'tier-c4', C5:'tier-c5' };
 
 function renderProduct(key) {
   const p = products[key];
   // Scores
-  const pct = { 1: '33%', 2: '66%', 3: '100%' };
-  document.getElementById('bar-g').style.width = pct[p.g];
-  document.getElementById('bar-d').style.width = pct[p.d];
-  document.getElementById('bar-c').style.width = pct[p.c];
-  document.getElementById('bar-x').style.width = pct[p.x];
-  document.getElementById('val-g').textContent = p.g;
-  document.getElementById('val-d').textContent = p.d;
-  document.getElementById('val-c').textContent = p.c;
-  document.getElementById('val-x').textContent = p.x;
+  document.getElementById('fill-g').style.width = (p.G / 5 * 100) + '%';
+  document.getElementById('fill-d').style.width = (p.D / 5 * 100) + '%';
+  document.getElementById('fill-c').style.width = (p.C / 5 * 100) + '%';
+  document.getElementById('fill-x').style.width = (p.X / 2 * 100) + '%';
+  document.getElementById('val-g').textContent = p.G;
+  document.getElementById('val-d').textContent = p.D;
+  document.getElementById('val-c').textContent = p.C;
+  document.getElementById('val-x').textContent = p.X;
 
-  // Processes
-  const pl = document.getElementById('process-list');
-  pl.innerHTML = p.processes.map(pr => `
-    <div class="proc-row">
-      <span class="${pr.active ? 'proc-active' : 'proc-inactive'}">${pr.name}</span>
-      <span class="tier tier-${pr.tier}">${pr.tier === 'off' ? '—' : pr.tier.toUpperCase()}</span>
-    </div>`).join('');
+  // Tier badge
+  const badge = document.getElementById('tier-badge');
+  badge.textContent = p.tier;
+  badge.className = 'tier ' + tierClasses[p.tier];
+
+  // Process list
+  const pl = document.getElementById('proc-list');
+  pl.innerHTML = p.processes.map(pr => {
+    if (!pr.active) return `<div class="proc-row"><span class="proc-inactive">${pr.name}</span><span style="font-family:var(--mono);font-size:9px;color:var(--dim);">—</span></div>`;
+    return `<div class="proc-row"><span class="proc-active">${pr.name}</span><span class="tier ${tierClasses[pr.tier]}">${pr.tier}</span></div>`;
+  }).join('');
 
   // Cost
-  document.getElementById('cost-total').textContent = p.total;
-  document.getElementById('cost-lines').innerHTML = p.lines.map(l => `
-    <div class="cost-line">
-      <span class="cost-line-name">${l.name}</span>
-      <span class="cost-line-val">${l.val}</span>
-    </div>`).join('');
-  document.getElementById('cost-factor').textContent = p.factor;
+  const total = p.processes.reduce((s, pr) => s + pr.cost, 0);
+  document.getElementById('cost-total').textContent = '$' + total.toLocaleString();
+  const cl = document.getElementById('cost-lines');
+  cl.innerHTML = p.processes
+    .filter(pr => pr.active)
+    .map(pr => `<div class="cost-line"><span class="cl-name">${pr.name}</span><span class="cl-val">${pr.cost.toLocaleString()}</span></div>`)
+    .join('');
+  const delta = Math.round((total / p.factorCost - 1) * 100);
+  const sign = delta >= 0 ? '+' : '';
+  document.getElementById('cost-delta').textContent = `factor estimate: $${p.factorCost.toLocaleString()} · delta: ${sign}${delta}%`;
 }
 
-// Toggle interaction
-document.getElementById('toggle-row').addEventListener('click', e => {
-  const card = e.target.closest('.toggle-card');
-  if (!card) return;
-  document.querySelectorAll('.toggle-card').forEach(c => c.classList.remove('active'));
-  card.classList.add('active');
-  renderProduct(card.dataset.product);
+// Tab switching
+document.getElementById('product-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.product-tab');
+  if (!tab) return;
+  document.querySelectorAll('.product-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  renderProduct(tab.dataset.product);
 });
 
-// Video thumb interaction
-document.querySelectorAll('.vthumb').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.vthumb').forEach(v => v.classList.remove('active'));
-    t.classList.add('active');
-  });
-});
-
-// Init
 renderProduct('bin');
 </script>
 </body>
