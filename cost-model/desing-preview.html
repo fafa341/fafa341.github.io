@@ -1,0 +1,61 @@
+<!-- ══ 5. ARCHITECTURE DIAGRAM (restored) ══ -->
+<div class="table-surface">
+  <div class="blueprint-mat" style="max-width:1004px; margin:0 auto;">
+    <div class="mat-header">
+      <div>
+        <div class="sys-label" style="margin-bottom:8px;">S.02 · System Architecture</div>
+        <div class="mat-section-title">The <em>decomposition</em> engine</div>
+        <div class="mat-sub">perfil_proceso × complexity_drivers → real_cost</div>
+      </div>
+      <div class="mat-section-num">02</div>
+    </div>
+
+    <div class="arch-schematic">
+      <!-- Inputs -->
+      <div class="arch-node-list">
+        <div class="sys-label" style="margin-bottom:8px; padding-left:4px;">PRODUCT INPUTS</div>
+        <div class="arch-node"><div class="arch-node-icon"><svg width="10" height="12" viewBox="0 0 10 12"><ellipse cx="5" cy="2" rx="4" ry="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="5" cy="10" rx="4" ry="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="2" x2="1" y2="10" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="2" x2="9" y2="10" stroke="currentColor" stroke-width="1.5"/></svg></div><div><div class="arch-node-text">Cylindrical Bin</div><div class="arch-node-sub">cilindrado profile</div></div></div>
+        <div class="arch-node"><div class="arch-node-icon"><svg width="12" height="8" viewBox="0 0 12 8"><rect x="0" y="2" width="12" height="4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div><div><div class="arch-node-text">Wall Shelf</div><div class="arch-node-sub">panel profile</div></div></div>
+        <div class="arch-node"><div class="arch-node-icon"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 11 H1 Z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div><div><div class="arch-node-text">Campana</div><div class="arch-node-sub">exhaust profile</div></div></div>
+        <div class="arch-node"><div class="arch-node-icon"><svg width="12" height="8" viewBox="0 0 12 8"><rect x="0" y="1" width="12" height="6" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="3.5" x2="12" y2="3.5" stroke="currentColor" stroke-width="0.75"/></svg></div><div><div class="arch-node-text">Counter</div><div class="arch-node-sub">flat-complex profile</div></div></div>
+      </div>
+
+      <!-- Arrow left -->
+      <div class="arch-arrow">
+        <svg width="40" height="2"><line x1="0" y1="1" x2="32" y2="1" stroke="#1B6FE8" stroke-width="1.5"/><polygon points="32,0 40,1 32,2" fill="#1B6FE8"/></svg>
+        <span style="color:var(--blue-mid); font-family:var(--font-mono);font-size:9px;">classify</span>
+      </div>
+
+      <!-- Engine -->
+      <div class="arch-engine">
+        <div class="engine-badge">COST ENGINE · v2</div>
+        <div class="engine-split">
+          <div class="engine-half">Profile<br>Classifier</div>
+          <div class="engine-half emphasis">G × D × C × X<br>Engine</div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:6px;margin-bottom:8px;">
+          <svg width="60" height="16" viewBox="0 0 60 16"><path d="M5,8 Q15,2 25,8 Q35,14 45,8 Q55,2 60,8" fill="none" stroke="rgba(27,111,232,0.5)" stroke-width="1.5"/></svg>
+        </div>
+        <div class="engine-footer">11 processes · 5 tiers · calibrated time estimates</div>
+      </div>
+
+      <!-- Arrow right -->
+      <div class="arch-arrow">
+        <svg width="40" height="2"><line x1="0" y1="1" x2="32" y2="1" stroke="#1B6FE8" stroke-width="1.5"/><polygon points="32,0 40,1 32,2" fill="#1B6FE8"/></svg>
+        <span style="color:var(--blue-mid); font-family:var(--font-mono);font-size:9px;">compute</span>
+      </div>
+
+      <!-- Outputs -->
+      <div class="arch-outputs">
+        <div class="sys-label" style="margin-bottom:8px;">OUTPUTS</div>
+        <div class="arch-output"><div class="arch-output-title">Accurate Quote</div><div class="arch-output-sub">breakeven + margin target</div></div>
+        <div class="arch-output"><div class="arch-output-title">Margin by Category</div><div class="arch-output-sub">first visibility in 30 years</div></div>
+        <div class="arch-output"><div class="arch-output-title">Competitive Pricing</div><div class="arch-output-sub">market-rate confidence</div></div>
+        <div class="arch-output"><div class="arch-output-title">Knowledge Transfer</div><div class="arch-output-sub">onboarding in weeks, not years</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 6. PRODUCT DECOMPOSITION ON MAT ══ -->
+<div class="table-surface">
